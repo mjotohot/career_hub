@@ -5,6 +5,7 @@ import { PhArrowRight } from '@phosphor-icons/vue'
 
 <template>
   <section
+    id="home"
     class="hero relative min-h-screen"
     :style="{
       backgroundImage: `url(${bgImage})`,

@@ -25,14 +25,14 @@ const features = [
 <template>
   <section
     id="about"
-    className="relative py-20 px-4 sm:px-6 lg:px-8"
+    className="relative py-40 px-4 sm:px-6 lg:px-8"
     :style="{
       backgroundImage: `url(${bgImage})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     }"
   >
-    <div class="absolute inset-0 bg-black/70 pointer-events-none"></div>
+    <div class="absolute inset-0 bg-[#003300]/75 pointer-events-none"></div>
     <div className="max-w-7xl mx-auto relative z-10 text-white">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <div>
@@ -43,7 +43,7 @@ const features = [
           </p>
           <ul className="space-y-4">
             <li v-for="(item, idx) in features" :key="idx" className="flex items-start gap-4">
-              <PhCheckCircle :size="32" />
+              <PhCheckCircle class="text-warning" :size="32" />
               <div>
                 <div className="font-semibold text-foreground">{{ item.title }}</div>
                 <div className="text-sm text-muted-foreground">{{ item.desc }}</div>
