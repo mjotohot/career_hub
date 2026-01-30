@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import bgImage from '@/assets/images/csu.png'
+import bgImage from '@/assets/images/hero.jpg'
 import { PhArrowRight } from '@phosphor-icons/vue'
 </script>
 
