@@ -1,18 +1,23 @@
 <script setup lang="ts">
+import { useThemeStore } from '@/stores/usethemeStore'
+import { useRoute } from 'vue-router'
+import csuLogo from '@/assets/images/logo.png'
+import navImage from '@/assets/images/navbar.svg'
+import LoginModal from '../modals/LoginModal.vue'
+import { ref } from 'vue'
 import {
   PhList,
-  PhSunDim,
+  PhSun,
   PhMoonStars,
   PhHouse,
   PhBookOpenUser,
   PhSignpost,
   PhUserGear,
 } from '@phosphor-icons/vue'
-import { useThemeStore } from '@/stores/theme'
-import csuLogo from '@/assets/images/logo.png'
-import navImage from '@/assets/images/navbar.svg'
 
+const isModalOpen = ref(false)
 const themeStore = useThemeStore()
+const route = useRoute()
 
 function toggleTheme() {
   themeStore.setTheme(themeStore.theme === 'dark' ? 'light' : 'dark')
@@ -39,13 +44,13 @@ function toggleTheme() {
             tabIndex="-1"
             class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow"
           >
-            <li>
+            <li v-if="route.path !== '/jobs'">
               <a><PhHouse :size="16" weight="bold" />Home</a>
             </li>
-            <li>
+            <li v-if="route.path !== '/jobs'">
               <a><PhSignpost :size="16" weight="bold" />How to apply?</a>
             </li>
-            <li>
+            <li v-if="route.path !== '/jobs'">
               <a><PhBookOpenUser :size="16" weight="bold" />About</a>
             </li>
           </ul>
@@ -58,31 +63,39 @@ function toggleTheme() {
       </div>
       <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1 text-white">
-          <li>
+          <li v-if="route.path !== '/jobs'">
             <a href="#home"><PhHouse :size="16" weight="bold" />Home</a>
           </li>
-          <li>
+          <li v-if="route.path !== '/jobs'">
             <a href="#apply"><PhSignpost :size="16" weight="bold" />How to apply?</a>
           </li>
-          <li>
+          <li v-if="route.path !== '/jobs'">
             <a href="#about"><PhBookOpenUser :size="16" weight="bold" />About</a>
           </li>
         </ul>
       </div>
       <div class="navbar-end flex items-center gap-3">
         <div class="hidden lg:flex gap-2">
-          <a class="btn btn-ghost text-white rounded-lg hover:text-black"
+          <a
+            class="btn btn-ghost text-white rounded-lg shadow-none border-none hover:text-black"
+            @click="isModalOpen = true"
             ><PhUserGear :size="16" weight="bold" />HR Staff Login</a
           >
-          <button class="btn bg-[#ff9900] rounded-lg text-white">Browse Jobs</button>
+          <router-link v-if="route.path !== '/jobs'" to="/jobs">
+            <button class="btn bg-[#ff9900] rounded-lg border-none shadow-none text-white">
+              Browse Jobs
+            </button>
+          </router-link>
         </div>
         <div class="h-8 w-px bg-white/40"></div>
         <label class="swap swap-rotate">
           <input type="checkbox" @change="toggleTheme" :checked="themeStore.theme === 'dark'" />
-          <PhSunDim class="swap-off text-white" :size="25" weight="bold" />
+          <PhSun class="swap-off text-white" :size="25" weight="bold" />
           <PhMoonStars class="swap-on" :size="25" weight="bold" />
         </label>
       </div>
     </div>
   </div>
+
+  <LoginModal v-if="isModalOpen" @close="isModalOpen = false" />
 </template>

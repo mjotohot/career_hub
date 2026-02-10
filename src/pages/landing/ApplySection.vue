@@ -19,7 +19,7 @@ const steps = [
 </script>
 
 <template>
-  <section id="apply" class="py-40 px-4 sm:px-6 lg:px-8">
+  <section id="apply" class="py-40 px-4 sm:px-6 lg:px-8 bg-base-300">
     <div class="max-w-7xl mx-auto">
       <div class="text-center mb-16">
         <h2 class="text-3xl sm:text-4xl font-bold text-foreground mb-4">How to Apply</h2>

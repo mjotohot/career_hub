@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import bgImage from '@/assets/images/hero.jpg'
 import { PhArrowRight } from '@phosphor-icons/vue'
+// import LoginModal from '@/components/modals/LoginModal.vue'
+// import { ref } from 'vue'
+
+// const isModalOpen = ref(false)
 </script>
 
 <template>
@@ -21,14 +25,21 @@ import { PhArrowRight } from '@phosphor-icons/vue'
         positions, submit your application, and we'll keep you updated via email.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <button class="btn bg-[#003300] text-white rounded-md">
-          Browse Open Positions
-          <PhArrowRight :size="20" weight="bold" />
-        </button>
-        <button class="btn btn-outline hover:bg-[#ff9900] text-white hover:border-none rounded-md">
+        <router-link to="/jobs">
+          <button class="btn bg-[#003300] text-white rounded-md">
+            Browse Open Positions
+            <PhArrowRight :size="20" weight="bold" />
+          </button>
+        </router-link>
+        <!-- <button
+          class="btn btn-outline hover:bg-[#ff9900] text-white hover:border-none rounded-md"
+          @click="isModalOpen = true"
+        >
           HR Staff Portal
-        </button>
+        </button> -->
       </div>
     </div>
   </section>
+
+  <!-- <LoginModal v-if="isModalOpen" @close="isModalOpen = false" /> -->
 </template>

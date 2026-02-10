@@ -6,12 +6,11 @@ export const useThemeStore = defineStore('theme', {
   }),
 
   actions: {
-    setTheme(name) {
+    setTheme(name: string) {
       this.theme = name
       document.documentElement.setAttribute('data-theme', name)
       localStorage.setItem('theme', name)
     },
-
     init() {
       const saved = localStorage.getItem('theme')
       if (saved) {
