@@ -1,5 +1,20 @@
 <script setup>
 import { PhX, PhUser, PhLockSimple } from '@phosphor-icons/vue'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { ref } from 'vue'
+
+const authStore = useAuthStore()
+const email = ref('')
+const password = ref('')
+
+const submit = async () => {
+  const success = await authStore.signIn(email.value, password.value)
+  if (success) {
+    window.location.href = '/dashboard'
+  } else {
+    alert(authStore.error)
+  }
+}
 
 const emit = defineEmits(['close'])
 </script>
@@ -16,16 +31,21 @@ const emit = defineEmits(['close'])
 
       <p className="mb-6">Sign in to manage positions and applications</p>
 
-      <form className="space-y-4">
+      <form className="space-y-4" @submit.prevent="submit">
         <label className="input w-full">
           <PhUser :size="20" weight="bold" />
-          <input type="text" className="grow" placeholder="ID Number" />
+          <input v-model="email" type="text" className="grow" placeholder="ID Number" required />
         </label>
         <label className="input w-full">
           <PhLockSimple :size="20" weight="bold" />
-          <input type="password" className="grow" placeholder="••••••••" />
+          <input
+            v-model="password"
+            type="password"
+            className="grow"
+            placeholder="••••••••"
+            required
+          />
         </label>
-
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2">
             <input
@@ -36,9 +56,9 @@ const emit = defineEmits(['close'])
           </label>
           <a href="#" className="text-sm text-primary transition"> Forgot password? </a>
         </div>
-
         <button
           type="submit"
+          :disabled="authStore.loading"
           className="btn bg-[#003300] text-white rounded-lg border-b-2 border-[#ff9900] w-full"
         >
           Access Dashboard

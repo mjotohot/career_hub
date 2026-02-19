@@ -1,52 +1,47 @@
 import { defineStore } from 'pinia'
 import type { Job } from '@/types/jobs'
+import type { JobFilters } from '@/types/jobFilters'
 import { fetchJobsService } from '@/services/fetchJobs'
 
 export const useJobsStore = defineStore('jobs', {
   state: () => ({
     jobs: [] as Job[],
-    page: 1,
-    pageSize: 5,
+    filters: {
+      page: 1,
+      pageSize: 5,
+      searchQuery: '',
+      jobType: '',
+      campus: '',
+      timePosted: '',
+    } as JobFilters,
     total: 0,
-    searchQuery: '' as string,
-    jobType: '' as '' | 'Full-Time' | 'Contract of Service',
-    timePosted: '' as '' | '24h' | '7d' | '30d',
-    campus: '' as string,
     isLoading: false,
   }),
 
   actions: {
     async fetchJobs() {
       this.isLoading = true
-      const { data, total } = await fetchJobsService({
-        page: this.page,
-        pageSize: this.pageSize,
-        searchQuery: this.searchQuery,
-        jobType: this.jobType,
-        campus: this.campus,
-        timePosted: this.timePosted,
-      })
-
+      const { data, total } = await fetchJobsService(this.filters)
       this.jobs = data
       this.total = total
       this.isLoading = false
     },
 
     async resetAndFetch() {
-      this.page = 1
+      this.filters.page = 1
       await this.fetchJobs()
     },
 
     async nextPage() {
-      if (this.page * this.pageSize < this.total) {
-        this.page++
+      if (this.filters.page * this.filters.pageSize < this.total) {
+        this.filters.page++
         await this.fetchJobs()
       }
     },
 
     async previousPage() {
-      if (this.page > 1) {
-        this.page--
+      if (this.filters.page > 1) {
+        this.filters.page--
         await this.fetchJobs()
       }
     },

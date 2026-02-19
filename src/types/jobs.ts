@@ -22,6 +22,5 @@ export interface Job {
   date_of_request: string
   expected_term_of_service: string
   status: 'open' | 'closed'
-  slots: number
   created_at: string
 }

@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import bgImage from '@/assets/images/hero.jpg'
 import { PhArrowRight } from '@phosphor-icons/vue'
-// import LoginModal from '@/components/modals/LoginModal.vue'
-// import { ref } from 'vue'
-
-// const isModalOpen = ref(false)
 </script>
 
 <template>
@@ -31,15 +27,7 @@ import { PhArrowRight } from '@phosphor-icons/vue'
             <PhArrowRight :size="20" weight="bold" />
           </button>
         </router-link>
-        <!-- <button
-          class="btn btn-outline hover:bg-[#ff9900] text-white hover:border-none rounded-md"
-          @click="isModalOpen = true"
-        >
-          HR Staff Portal
-        </button> -->
       </div>
     </div>
   </section>
-
-  <!-- <LoginModal v-if="isModalOpen" @close="isModalOpen = false" /> -->
 </template>
