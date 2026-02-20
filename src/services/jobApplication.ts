@@ -35,6 +35,7 @@ export async function jobApplicationService(formData: ApplicationPayload) {
           experience: formData.experience,
           skills: formData.skills,
           training: formData.training,
+          eligibility: formData.eligiblity,
         },
         { onConflict: 'email' },
       )
@@ -52,15 +53,19 @@ export async function jobApplicationService(formData: ApplicationPayload) {
     // if (slotError) throw slotError
     // if (slot.number_of_slots <= 0) return { success: false, error: 'No slots available' }
 
-    const { error: applicationError } = await supabase.from('applications').insert({
-      job_id: formData.jobId,
-      applicant_id: applicant.applicant_id,
-      region: formData.region,
-      province: formData.province,
-      city: formData.city,
-      pds_file: pdsPath,
-      wes_file: wesPath,
-    })
+    const { data: applicationData, error: applicationError } = await supabase
+      .from('applications')
+      .insert({
+        job_id: formData.jobId,
+        applicant_id: applicant.applicant_id,
+        region: formData.region,
+        province: formData.province,
+        city: formData.city,
+        pds_file: pdsPath,
+        wes_file: wesPath,
+      })
+      .select('application_id')
+      .single()
 
     if (applicationError) throw applicationError
 
@@ -73,7 +78,7 @@ export async function jobApplicationService(formData: ApplicationPayload) {
     //   console.warn('Application saved but slot decrement failed')
     // }
 
-    return { success: true }
+    return { success: true, applicationId: applicationData.application_id }
   } catch (err) {
     console.error('Error submitting application:', err)
     return { success: false, error: err }

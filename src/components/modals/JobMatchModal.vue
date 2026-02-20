@@ -24,8 +24,8 @@ const config = computed(() => {
         badgeLabel: 'Analyzing...',
         title: 'Evaluating Your Match',
         message:
-          'Our AI is reviewing your qualifications against the job requirements. This will only take a moment.',
-        accentClass: 'border-info/30 bg-info/5',
+          'AI is reviewing your qualifications against the job requirements. This will only take a moment.',
+        // accentClass: 'border-info/30 bg-info/5',
       }
     case 'pass':
       return {
@@ -36,7 +36,7 @@ const config = computed(() => {
         title: 'Great News!',
         message:
           'Your qualifications align well with this position. The hiring team will review your application shortly.',
-        accentClass: 'border-success/30 bg-success/5',
+        // accentClass: 'border-success/30 bg-success/5',
       }
     case 'fail':
       return {
@@ -47,20 +47,19 @@ const config = computed(() => {
         title: 'Application Submitted',
         message:
           'Your qualifications may not fully match all requirements, but we still encourage you. The hiring team will review every application carefully.',
-        accentClass: 'border-warning/30 bg-warning/5',
+        // accentClass: 'border-warning/30 bg-warning/5',
       }
     default:
       return null
   }
 })
+
+// :class="config?.accentClass ?? 'border-base-200'"
 </script>
 
 <template>
   <dialog class="modal modal-bottom sm:modal-middle z-9999" :class="{ 'modal-open': isOpen }">
-    <div
-      class="modal-box max-w-sm border transition-colors duration-500"
-      :class="config?.accentClass ?? 'border-base-200'"
-    >
+    <div class="modal-box max-w-sm border transition-colors duration-500 border-base-200">
       <button
         v-if="isCloseable"
         class="btn btn-sm btn-circle btn-ghost absolute right-3 top-3"
@@ -87,12 +86,12 @@ const config = computed(() => {
 
         <h3 class="font-bold text-lg leading-tight">{{ config?.title }}</h3>
 
-        <p class="text-sm text-base-content/65 leading-relaxed px-2">
+        <p class="text-sm text-base-content/80 leading-relaxed px-2">
           {{ config?.message }}
         </p>
 
-        <p v-if="jobTitle" class="text-xs font-medium text-base-content/40 mt-1">
-          {{ jobTitle }}
+        <p v-if="jobTitle" class="text-xs text-base-content font-semibold mt-1">
+          Applied Role: {{ jobTitle }}
         </p>
       </div>
 

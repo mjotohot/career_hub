@@ -11,6 +11,7 @@ export interface ApplicationFormData {
   education: string
   experience: string
   training: string
+  eligiblity: string
   pdsFile: File | null
   wesFile: File | null
 }

@@ -109,6 +109,8 @@ export async function assessJobMatch(
       }
 
       const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+      console.log('Gemini raw response:', data)
+      console.log('Gemini text:', data.candidates?.[0]?.content?.parts?.[0]?.text)
       return parseGeminiResponse(responseText)
     } catch (error) {
       const isLastAttempt = attempt === MAX_RETRIES - 1

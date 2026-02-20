@@ -1,150 +1,45 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref } from 'vue'
 import type { Job } from '@/types/jobs'
-import type { ApplicationFormData, ApplicationPayload } from '@/types/applyform'
-import { jobApplicationService } from '@/services/jobApplication'
-import { assessJobMatch } from '@/services/geminiJobMatcher'
-import { PhInfo, PhX } from '@phosphor-icons/vue'
+import { useJobApplication } from '@/composables/useJobApplication'
 import AppFormField from '@/components/inputs/AppFormField.vue'
 import AppConfirmModal from '@/components/modals/AppConfirmModal.vue'
 import AppJobMatchModal from '@/components/modals/JobMatchModal.vue'
 import AppToast from '@/components/toasts/AppToast.vue'
+import { PhInfo, PhX } from '@phosphor-icons/vue'
 
-const GENDER_OPTIONS = [
-  { label: 'Male', value: 'Male' },
-  { label: 'Female', value: 'Female' },
-]
+const props = defineProps<{ job: Job; isOpen: boolean }>()
+const emit = defineEmits<{ close: [] }>()
 
-const REGION_OPTIONS = [
-  { label: 'Region 1', value: 'Region 1' },
-  { label: 'Region 2', value: 'Region 2' },
-]
-
-const PROVINCE_OPTIONS = [
-  { label: 'Province 1', value: 'Province 1' },
-  { label: 'Province 2', value: 'Province 2' },
-]
-
-const steps = [
-  { id: 1, label: 'Personal' },
-  { id: 2, label: 'Documents' },
-  { id: 3, label: 'Confirm' },
-]
-
-const stepRequirements: Record<number, (keyof ApplicationFormData)[]> = {
-  1: ['fullName', 'email', 'birthdate', 'mobileNumber', 'gender', 'region', 'province', 'city'],
-  2: ['skills', 'education'],
-  3: ['pdsFile', 'wesFile'],
-}
-
-const props = defineProps<{
-  job: Job
-  isOpen: boolean
-}>()
-
-const emit = defineEmits<{
-  close: []
-  submit: [formData: ApplicationFormData]
-}>()
-
-const initialFormData: ApplicationFormData = {
-  fullName: '',
-  email: '',
-  birthdate: '',
-  mobileNumber: '',
-  gender: '',
-  region: '',
-  province: '',
-  city: '',
-  skills: '',
-  education: '',
-  experience: '',
-  training: '',
-  pdsFile: null,
-  wesFile: null,
-}
-
-const currentStep = ref(1)
-const isLoading = ref(false)
-const showCloseConfirm = ref(false)
-const formData = reactive<ApplicationFormData>({ ...initialFormData })
 const toast = ref<InstanceType<typeof AppToast>>()
-const jobMatchModalOpen = ref(false)
-const jobMatchStatus = ref<'loading' | 'pass' | 'fail' | null>(null)
 
-const isCurrentStepValid = computed(
-  () => stepRequirements[currentStep.value]?.every((key) => Boolean(formData[key])) ?? false,
-)
+const {
+  formData,
+  currentStep,
+  isLoading,
+  jobMatchModalOpen,
+  jobMatchStatus,
+  steps,
+  isCurrentStepValid,
+  canSubmit,
+  nextStep,
+  prevStep,
+  resetForm,
+  submitApplication,
+} = useJobApplication(props.job)
 
-const canSubmit = computed(() => currentStep.value === 3 && isCurrentStepValid.value)
-
-const resetForm = () => {
-  currentStep.value = 1
-  Object.assign(formData, initialFormData)
-}
-
-const nextStep = () => {
-  if (isCurrentStepValid.value && currentStep.value < steps.length) currentStep.value++
-}
-
-const prevStep = () => {
-  if (currentStep.value > 1) currentStep.value--
-}
-
-const handleMatchModalClose = () => {
-  jobMatchModalOpen.value = false
-  jobMatchStatus.value = null
-  emit('close')
-}
-
-const submitApplication = async () => {
-  if (!canSubmit.value || isLoading.value) {
-    toast.value?.add('warning', 'Please complete all required documents.')
-    return
-  }
-
-  try {
-    isLoading.value = true
-    const result = await jobApplicationService({
-      ...formData,
-      jobId: props.job.job_id,
-    } satisfies ApplicationPayload)
-
-    if (!result.success) {
-      toast.value?.add('error', 'Failed to submit application. Please try again.')
-      return
-    }
-
-    toast.value?.add('success', 'Application submitted successfully!')
-    resetForm()
-    emit('close')
-    jobMatchStatus.value = 'loading'
-    jobMatchModalOpen.value = true
-
-    const matchResult = await assessJobMatch(
-      props.job,
-      formData,
-      import.meta.env.VITE_GEMINI_API_KEY,
-    )
-
-    jobMatchStatus.value = matchResult.status === 'pass' ? 'pass' : 'fail'
-  } catch (error) {
-    toast.value?.add('error', 'An unexpected error occurred. Please try again.')
-    console.error('Application submission error:', error)
-    jobMatchModalOpen.value = false
-    jobMatchStatus.value = null
-  } finally {
-    isLoading.value = false
-  }
-}
+const showCloseConfirm = ref(false)
 
 const handleClose = () => {
   showCloseConfirm.value = true
 }
-
 const confirmClose = () => {
   showCloseConfirm.value = false
   resetForm()
+  emit('close')
+}
+const handleMatchModalClose = () => {
+  jobMatchModalOpen.value = false
   emit('close')
 }
 </script>
@@ -221,7 +116,10 @@ const confirmClose = () => {
                 v-model="formData.gender"
                 label="Gender"
                 type="select"
-                :options="GENDER_OPTIONS"
+                :options="[
+                  { label: 'Male', value: 'Male' },
+                  { label: 'Female', value: 'Female' },
+                ]"
                 required
               />
             </div>
@@ -229,14 +127,20 @@ const confirmClose = () => {
               v-model="formData.region"
               label="Region"
               type="select"
-              :options="REGION_OPTIONS"
+              :options="[
+                { label: 'Region 1', value: 'Region 1' },
+                { label: 'Region 2', value: 'Region 2' },
+              ]"
               required
             />
             <AppFormField
               v-model="formData.province"
               label="Province"
               type="select"
-              :options="PROVINCE_OPTIONS"
+              :options="[
+                { label: 'Province 1', value: 'Province 1' },
+                { label: 'Province 2', value: 'Province 2' },
+              ]"
               required
             />
           </div>
@@ -275,6 +179,16 @@ const confirmClose = () => {
               required
             />
             <AppFormField
+              class="col-span-2"
+              v-model="formData.eligiblity"
+              label="Eligibility"
+              type="textarea"
+              :rows="3"
+              placeholder="e.g. Civil Service Professional, PRC Licensed Teacher, or Career Service Sub-Professional..."
+              hint="Specify the type of eligibility, rating (if applicable), and date of conferment"
+              required
+            />
+            <AppFormField
               v-model="formData.experience"
               label="Work Experience"
               type="textarea"
@@ -300,14 +214,12 @@ const confirmClose = () => {
           <h4 class="font-bold text-sm mb-2">Final Confirmation</h4>
           <div class="alert alert-info shadow-sm text-xs py-2 px-3 text-white">
             <PhInfo :size="16" />
-            <span>
-              Follow the naming convention:
-              <strong>(Family Name)_(Hiring Office)</strong>
-            </span>
+            <span
+              >Follow the naming convention: <strong>(Family Name)_(Hiring Office)</strong></span
+            >
           </div>
 
           <fieldset class="fieldset">
-            <legend class="fieldset-legend text-gray-500">Personal Data Sheet (PDS) *</legend>
             <AppFormField
               v-model="formData.pdsFile"
               label="Personal Data Sheet (PDS)"
@@ -324,7 +236,6 @@ const confirmClose = () => {
           </fieldset>
 
           <fieldset class="fieldset">
-            <legend class="fieldset-legend text-gray-500">Work Experience Sheet (WES) *</legend>
             <AppFormField
               v-model="formData.wesFile"
               label="Work Experience Sheet (WES)"
@@ -344,7 +255,7 @@ const confirmClose = () => {
 
       <div class="modal-action p-6 border-t border-base-200 bg-base-200/10">
         <button v-if="currentStep > 1" @click="prevStep" class="btn btn-ghost">Back</button>
-        <div class="flex-1" />
+        <div class="flex-1"></div>
         <button
           v-if="currentStep < 3"
           @click="nextStep"
@@ -355,7 +266,7 @@ const confirmClose = () => {
         </button>
         <button
           v-else
-          @click="submitApplication"
+          @click="submitApplication(toast)"
           class="btn btn-success text-white px-8"
           :disabled="!canSubmit || isLoading"
         >
