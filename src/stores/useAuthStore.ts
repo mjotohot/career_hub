@@ -1,23 +1,28 @@
 import { defineStore } from 'pinia'
 import { signInWithEmail, signOutUser, getCurrentUser, onAuthStateChanged } from '@/services/auth'
-import type { User } from '@supabase/supabase-js'
+import type { AppUser } from '@/services/auth'
 
 interface AuthState {
-  user: User | null
+  user: AppUser | null
   loading: boolean
   error: string | null
+  initialized: boolean
 }
+
+let initPromise: Promise<void> | null = null
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
     user: null,
     loading: false,
     error: null,
+    initialized: false,
   }),
 
   getters: {
     isAuthenticated: (state) => !!state.user,
     userEmail: (state) => state.user?.email ?? null,
+    isAdmin: (state) => state.user?.is_admin ?? false,
   },
 
   actions: {
@@ -48,10 +53,23 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async initialize() {
-      this.user = await getCurrentUser()
-      onAuthStateChanged((user) => {
-        this.user = user
-      })
+      if (!initPromise) {
+        initPromise = (async () => {
+          this.user = await getCurrentUser()
+          onAuthStateChanged((user) => {
+            this.user = user
+          })
+          this.initialized = true
+        })()
+      }
+      return initPromise
     },
   },
 })
+
+export async function waitForAuthInit() {
+  const authStore = useAuthStore()
+  if (!authStore.initialized) {
+    await initPromise
+  }
+}

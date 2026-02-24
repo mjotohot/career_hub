@@ -1,8 +1,11 @@
 import { supabase } from '@/services/supabase'
 import type { User } from '@supabase/supabase-js'
 
+export interface AppUser extends User {
+  is_admin: boolean
+}
 export interface SignIn {
-  user: User | null
+  user: AppUser | null
   error: string | null
 }
 
@@ -12,10 +15,37 @@ export async function signInWithEmail(email: string, password: string): Promise<
     password,
   })
 
-  return {
-    user: data?.user ?? null,
-    error: error?.message ?? null,
+  console.log('Supabase signIn result:', data, error)
+
+  if (error || !data.user) {
+    return {
+      user: null,
+      error: error?.message ?? 'Login failed',
+    }
   }
+
+  const appUser = await fetchUserProfile(data.user)
+  return {
+    user: appUser,
+    error: null,
+  }
+}
+
+export async function getCurrentUser(): Promise<AppUser | null> {
+  const { data } = await supabase.auth.getSession()
+  const user = data.session?.user ?? null
+
+  if (!user) return null
+
+  return fetchUserProfile(user)
+}
+
+export function onAuthStateChanged(callback: (user: AppUser | null) => void) {
+  return supabase.auth.onAuthStateChange(async (_event, session) => {
+    const user = session?.user ?? null
+    const appUser = user ? await fetchUserProfile(user) : null
+    callback(appUser)
+  })
 }
 
 export async function signOutUser(): Promise<string | null> {
@@ -23,14 +53,25 @@ export async function signOutUser(): Promise<string | null> {
   return error?.message ?? null
 }
 
-export async function getCurrentUser(): Promise<User | null> {
-  const { data } = await supabase.auth.getSession()
-  return data.session?.user ?? null
-}
+async function fetchUserProfile(user: User): Promise<AppUser> {
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .single()
 
-export function onAuthStateChanged(callback: (user: User | null) => void) {
-  return supabase.auth.onAuthStateChange((_event, session) => {
-    const user = session?.user ?? null
-    callback(user)
-  })
+  console.log('profile result:', profile, 'error:', error)
+
+  if (error) {
+    console.error('Failed to load profile', error)
+    return {
+      ...user,
+      is_admin: false,
+    }
+  }
+
+  return {
+    ...user,
+    is_admin: profile?.is_admin ?? false,
+  }
 }

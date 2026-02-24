@@ -72,6 +72,11 @@ function toggleTheme() {
           <li v-if="route.path !== '/jobs'">
             <a href="#about"><PhBookOpenUser :size="16" weight="bold" />About</a>
           </li>
+          <li v-if="route.path !== '/jobs'">
+            <router-link to="/track"
+              ><PhBookOpenUser :size="16" weight="bold" />Track Application</router-link
+            >
+          </li>
         </ul>
       </div>
       <div class="navbar-end flex items-center gap-3">

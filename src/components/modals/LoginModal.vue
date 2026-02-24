@@ -1,16 +1,18 @@
 <script setup>
 import { PhX, PhUser, PhLockSimple } from '@phosphor-icons/vue'
 import { useAuthStore } from '@/stores/useAuthStore'
+import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 
 const authStore = useAuthStore()
+const router = useRouter()
 const email = ref('')
 const password = ref('')
 
 const submit = async () => {
   const success = await authStore.signIn(email.value, password.value)
   if (success) {
-    window.location.href = '/dashboard'
+    await router.push('/admin/dashboard')
   } else {
     alert(authStore.error)
   }
@@ -34,7 +36,7 @@ const emit = defineEmits(['close'])
       <form className="space-y-4" @submit.prevent="submit">
         <label className="input w-full">
           <PhUser :size="20" weight="bold" />
-          <input v-model="email" type="text" className="grow" placeholder="ID Number" required />
+          <input v-model="email" type="email" className="grow" placeholder="Email" required />
         </label>
         <label className="input w-full">
           <PhLockSimple :size="20" weight="bold" />

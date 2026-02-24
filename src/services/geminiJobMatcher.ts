@@ -32,17 +32,13 @@ interface GeminiResponse {
   }
 }
 
-// Flash-Lite: 15 RPM, 1,000 RPD on free tier — best headroom for simple classification
 const GEMINI_MODEL = 'gemini-2.5-flash-lite'
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`
 
 const MAX_RETRIES = 2
 const RETRY_BASE_DELAY_MS = 10_000 // 10s base — respects the RPM rolling window
 
-/**
- * Calls Gemini AI to assess if an applicant matches a job position.
- * Retries with exponential backoff on 429 rate limit errors.
- */
+//Retries with exponential backoff on 429 rate limit errors.
 export async function assessJobMatch(
   job: Job,
   applicantData: ApplicationFormData,
@@ -125,7 +121,6 @@ export async function assessJobMatch(
     }
   }
 
-  // Should never reach here, but TypeScript needs a return
   return { status: 'fail', reason: 'Unknown error' }
 }
 

@@ -33,3 +33,39 @@ export const fetchJobsService = async (
   console.log('Fetched jobs:', data)
   return { data: data ?? [], total: count ?? 0 }
 }
+
+export async function getJobs(searchQuery?: string, campus?: string) {
+  let query = supabase.from('jobs').select(
+    `
+      job_id,
+      campus,
+      department_unit,
+      open_position,
+      job_desc,
+      number_of_slots,
+      position_type,
+      salary_grade,
+      salary_rate,
+      education_desired,
+      experience_desired,
+      eligibility_desired,
+      trainings_desired,
+      other_qualifications,
+      created_at,
+      status
+    `,
+  )
+
+  if (searchQuery && searchQuery.trim()) {
+    query = query.ilike('open_position', `%${searchQuery}%`)
+  }
+
+  if (campus && campus.trim()) {
+    query = query.eq('campus', campus)
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data
+}
