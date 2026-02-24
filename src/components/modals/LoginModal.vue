@@ -63,7 +63,13 @@ const emit = defineEmits(['close'])
           :disabled="authStore.loading"
           className="btn bg-[#003300] text-white rounded-lg border-b-2 border-[#ff9900] w-full"
         >
-          Access Dashboard
+          <span v-if="authStore.loading" class="flex items-center justify-center gap-2">
+            <div
+              class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+            ></div>
+            Loading…
+          </span>
+          <span v-else>Access Dashboard</span>
         </button>
       </form>
 

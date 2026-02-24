@@ -46,6 +46,11 @@ const fetchJobs = async (query?: string, campus?: string) => {
       getApplicationsByStatus('pass'),
     ])
 
+    // Debug: log raw results to help trace missing data
+    console.log('fetchJobs: jobsData', jobsData)
+    console.log('fetchJobs: applicationRows', applicationRows)
+    console.log('fetchJobs: mapped', mapApplicationsByJob(applicationRows))
+
     jobs.value = jobsData
     applicantsByJob.value = mapApplicationsByJob(applicationRows)
 

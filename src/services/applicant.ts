@@ -22,6 +22,7 @@ export async function getApplicationsByStatus(match_status: 'pass' | 'fail') {
   if (error) throw error
   return data
 }
+
 export async function getAllApplications(status?: 'pass' | 'fail' | 'all', searchQuery?: string) {
   let query = supabase.from('applications').select(
     `
