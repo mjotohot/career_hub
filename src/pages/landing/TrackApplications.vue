@@ -11,6 +11,7 @@ import {
   PhBriefcase,
 } from '@phosphor-icons/vue'
 import { useRouter } from 'vue-router'
+import bgImage from '@/assets/images/csu1.jpg'
 import type { ApplicationResult } from '@/types/applicationResult'
 
 const router = useRouter()
@@ -72,7 +73,7 @@ const getStatusConfig = (status: string) => {
   if (status === 'fail')
     return {
       wrapClass: 'bg-rose-50 text-rose-600 border border-rose-200',
-      label: 'Not Selected',
+      label: 'Failed',
       icon: PhXCircle,
     }
   return {
@@ -85,44 +86,38 @@ const getStatusConfig = (status: string) => {
 
 <template>
   <div class="min-h-screen bg-stone-50 relative overflow-x-hidden">
-    <!-- Decorative background blobs -->
-    <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      <div
-        class="absolute -top-32 -right-24 w-96 h-96 rounded-full bg-blue-100 opacity-60 blur-3xl"
-      />
-      <div
-        class="absolute bottom-0 -left-24 w-80 h-80 rounded-full bg-violet-100 opacity-40 blur-3xl"
-      />
+    <div
+      class="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      :style="{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }"
+    >
+      <div class="absolute inset-0 bg-[#003300]/75 pointer-events-none"></div>
     </div>
-
-    <!-- Nav -->
-    <nav class="relative z-10 px-8 pt-6 pb-2">
+    <nav class="relative z-10 px-8 pt-6">
       <button
         @click="router.back()"
-        class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-stone-100 transition-all rounded-lg px-3 py-2"
+        class="inline-flex items-center gap-2 text-sm font-medium text-white hover:text-gray-900 hover:bg-stone-100 transition-all rounded-lg px-3 py-2"
       >
         <PhArrowLeft :size="15" weight="bold" />
         Back
       </button>
     </nav>
-
-    <!-- Main -->
-    <main class="relative z-10 max-w-3xl mx-auto px-4 pb-24 pt-4">
-      <!-- Header -->
+    <main class="relative z-10 max-w-3xl mx-auto px-4 pb-24">
       <div class="text-center mb-10">
         <div
-          class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gray-900 text-white mb-5 shadow-lg"
+          class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#ff9900] text-white mb-5 shadow-lg"
         >
           <PhBriefcase :size="26" weight="duotone" />
         </div>
-        <h1 class="text-4xl font-bold tracking-tight text-gray-900 mb-2">Application Status</h1>
-        <p class="text-gray-400 text-base font-light">
+        <h1 class="text-4xl font-bold tracking-tight text-white mb-2">Application Status</h1>
+        <p class="text-gray-300 text-base font-light">
           Enter your email to track your job applications
         </p>
       </div>
-
-      <!-- Search card -->
-      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm p-6 mb-5">
+      <div class="bg-base-300 rounded-2xl border border-stone-200 shadow-sm p-6 mb-5">
         <label
           class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3"
         >
@@ -140,7 +135,7 @@ const getStatusConfig = (status: string) => {
           <button
             @click="handleSearch"
             :disabled="!email.trim() || isLoading"
-            class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gray-900 text-white text-sm font-semibold shadow-md hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 disabled:bg-stone-300 disabled:shadow-none disabled:cursor-not-allowed transition-all duration-150 whitespace-nowrap"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#003300] text-white text-sm font-semibold shadow-md hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 disabled:bg-stone-300 disabled:shadow-none disabled:cursor-not-allowed transition-all duration-150 whitespace-nowrap"
           >
             <template v-if="!isLoading">
               <PhMagnifyingGlass :size="15" weight="bold" />
@@ -154,22 +149,19 @@ const getStatusConfig = (status: string) => {
             </template>
           </button>
         </div>
-        <p class="text-xs text-stone-300 font-light">
-          Use the email address you provided when applying
+        <p class="text-xs text-gray-400 font-light italic">
+          *Use the email address you provided when applying
         </p>
       </div>
-
-      <!-- Results panel -->
-      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden min-h-52">
-        <!-- Loading -->
+      <div
+        class="bg-gray-200 rounded-2xl border border-stone-200 shadow-sm overflow-hidden min-h-52"
+      >
         <div v-if="isLoading" class="flex flex-col items-center justify-center py-16 gap-4">
           <div
             class="w-9 h-9 rounded-full border-2 border-stone-200 border-t-gray-900 animate-spin"
-          />
+          ></div>
           <p class="text-sm text-gray-400 font-light">Searching your applications…</p>
         </div>
-
-        <!-- Prompt state -->
         <div v-else-if="!hasSearched" class="flex flex-col items-center justify-center py-16 gap-3">
           <div
             class="w-16 h-16 rounded-2xl bg-stone-100 flex items-center justify-center text-stone-400"
@@ -181,8 +173,6 @@ const getStatusConfig = (status: string) => {
             Enter your email above and we'll pull up all your applications.
           </p>
         </div>
-
-        <!-- No results -->
         <div
           v-else-if="applications.length === 0"
           class="flex flex-col items-center justify-center py-16 gap-3"
@@ -197,34 +187,30 @@ const getStatusConfig = (status: string) => {
             Try a different email, or apply for a position to get started.
           </p>
         </div>
-
-        <!-- Table -->
         <template v-else>
-          <div
-            class="px-6 pt-5 pb-1 text-xs font-semibold uppercase tracking-widest text-stone-300"
-          >
+          <div class="px-6 pt-5 pb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">
             {{ applications.length }} application{{ applications.length !== 1 ? 's' : '' }} found
           </div>
           <table class="w-full">
             <thead>
               <tr class="border-b border-stone-100">
                 <th
-                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest text-stone-300"
+                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest italic text-gray-400"
                 >
                   Position
                 </th>
                 <th
-                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest text-stone-300 hidden sm:table-cell"
+                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest italic text-gray-400 hidden sm:table-cell"
                 >
                   Campus & Dept.
                 </th>
                 <th
-                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest text-stone-300"
+                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest italic text-gray-400"
                 >
                   Applied
                 </th>
                 <th
-                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest text-stone-300"
+                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-widest italic text-gray-400"
                 >
                   Status
                 </th>
@@ -266,22 +252,16 @@ const getStatusConfig = (status: string) => {
           </table>
         </template>
       </div>
-
-      <!-- Legend -->
       <div
-        class="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-stone-400 font-light"
+        class="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm italic text-gray-300 font-light"
       >
         <span class="flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
           Passed — cleared initial screening
         </span>
         <span class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-amber-400 inline-block" />
-          Under Review — awaiting decision
-        </span>
-        <span class="flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-rose-400 inline-block" />
-          Not Selected — not moving forward
+          Failed — partial match or did not meet requirements
         </span>
       </div>
     </main>
