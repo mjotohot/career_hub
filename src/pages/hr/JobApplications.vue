@@ -3,6 +3,7 @@ import AdminLayout from '@/components/navigations/AdminLayout.vue'
 import { getJobs } from '@/services/fetchJobs'
 import { getApplicationsByStatus } from '@/services/applicant'
 import { mapApplicationsByJob } from '@/services/applicantsMapper'
+import { getApplicationsForExport, exportApplicantsPDF } from '@/services/appExportPDF'
 import { supabase } from '@/services/supabase'
 import type { Job } from '@/types/jobs'
 import type { Applicant } from '@/types/applicant'
@@ -68,6 +69,11 @@ const handleSearch = (query: string) => {
   searchTimeout = setTimeout(() => {
     fetchJobs(query, selectedCampus.value)
   }, 500) // Wait 500ms after user stops typing
+}
+
+const handleExport = async (job_id: string) => {
+  const data = await getApplicationsForExport(job_id, 'pass')
+  exportApplicantsPDF(data)
 }
 
 // Handle campus filter change
@@ -254,6 +260,18 @@ const formatDate = (d: string) =>
                 <PhUsers :size="11" weight="bold" />
                 {{ applicantsByJob[job.job_id]?.length ?? 0 }} applicants
               </span>
+              <button
+                class="btn btn-xs text-white rounded-md transition-all"
+                :class="
+                  (applicantsByJob[job.job_id]?.length ?? 0) > 0
+                    ? 'btn-error cursor-pointer'
+                    : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+                "
+                :disabled="(applicantsByJob[job.job_id]?.length ?? 0) === 0"
+                @click="handleExport(job.job_id)"
+              >
+                Export PDF
+              </button>
               <PhCaretUp
                 v-if="!collapsed.has(job.job_id)"
                 :size="14"
