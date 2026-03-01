@@ -224,7 +224,7 @@ const handleMatchModalClose = () => {
               v-model="formData.pdsFile"
               label="Personal Data Sheet (PDS)"
               type="file"
-              accept=".pdf,.doc,.docx"
+              accept=".pdf"
               required
             >
               <template #file-confirmation>
@@ -240,12 +240,44 @@ const handleMatchModalClose = () => {
               v-model="formData.wesFile"
               label="Work Experience Sheet (WES)"
               type="file"
-              accept=".pdf,.doc,.docx"
+              accept=".pdf"
               required
             >
               <template #file-confirmation>
                 <p v-if="formData.wesFile" class="text-xs text-success mt-1">
                   ✓ {{ (formData.wesFile as File).name }}
+                </p>
+              </template>
+            </AppFormField>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <AppFormField
+              v-model="formData.eligiblityFile"
+              label="Eligibility Certiificate"
+              type="file"
+              accept=".pdf"
+              required
+            >
+              <template #file-confirmation>
+                <p v-if="formData.eligiblityFile" class="text-xs text-success mt-1">
+                  ✓ {{ (formData.eligiblityFile as File).name }}
+                </p>
+              </template>
+            </AppFormField>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <AppFormField
+              v-model="formData.bachelorsFile"
+              label="Bachelor's Degree Certificate"
+              type="file"
+              accept=".pdf"
+              required
+            >
+              <template #file-confirmation>
+                <p v-if="formData.bachelorsFile" class="text-xs text-success mt-1">
+                  ✓ {{ (formData.bachelorsFile as File).name }}
                 </p>
               </template>
             </AppFormField>

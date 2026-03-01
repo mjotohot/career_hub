@@ -9,6 +9,8 @@ export async function getApplicationsByStatus(match_status: 'pass' | 'fail') {
       applied_at,
       pds_file,
       wes_file,
+      eligibility_file,
+      bachelors_file,
       job_id,
       applicants (
         applicant_id,
@@ -18,6 +20,8 @@ export async function getApplicationsByStatus(match_status: 'pass' | 'fail') {
     `,
     )
     .eq('match_status', match_status)
+
+  console.log('Applications by status:', data, error)
 
   if (error) throw error
   return data

@@ -47,11 +47,6 @@ const fetchJobs = async (query?: string, campus?: string) => {
       getApplicationsByStatus('pass'),
     ])
 
-    // Debug: log raw results to help trace missing data
-    console.log('fetchJobs: jobsData', jobsData)
-    console.log('fetchJobs: applicationRows', applicationRows)
-    console.log('fetchJobs: mapped', mapApplicationsByJob(applicationRows))
-
     jobs.value = jobsData
     applicantsByJob.value = mapApplicationsByJob(applicationRows)
 
@@ -91,8 +86,10 @@ const toggleCollapse = (jobId: string) => {
 }
 
 // Drawer state
+type DrawerDoc = 'pds' | 'we' | 'bachelors' | 'eligibility'
+const drawerDoc = ref<DrawerDoc>('pds')
+
 const drawerApplicant = ref<Applicant | null>(null)
-const drawerDoc = ref<'pds' | 'we'>('pds')
 const drawerUrl = ref('')
 
 // Convert Supabase Storage path to full public URL
@@ -103,18 +100,32 @@ const getStorageUrl = (path: string) => {
   return data.publicUrl
 }
 
-const openDrawer = (applicant: Applicant, doc: 'pds' | 'we') => {
+const resolveDocPath = (applicant: Applicant, doc: DrawerDoc) => {
+  switch (doc) {
+    case 'pds':
+      return applicant.personalDataSheet
+    case 'we':
+      return applicant.workExperience
+    case 'bachelors':
+      return applicant.bachelorsDiploma
+    case 'eligibility':
+      return applicant.eligibilityCertificate
+  }
+}
+
+const openDrawer = (applicant: Applicant, doc: DrawerDoc) => {
   drawerApplicant.value = applicant
   drawerDoc.value = doc
-  const path = doc === 'pds' ? applicant.personalDataSheet : applicant.workExperience
+
+  const path = resolveDocPath(applicant, doc)
   drawerUrl.value = getStorageUrl(path)
 }
 
-const switchDoc = (doc: 'pds' | 'we') => {
+const switchDoc = (doc: DrawerDoc) => {
   if (!drawerApplicant.value) return
+
   drawerDoc.value = doc
-  const path =
-    doc === 'pds' ? drawerApplicant.value.personalDataSheet : drawerApplicant.value.workExperience
+  const path = resolveDocPath(drawerApplicant.value, doc)
   drawerUrl.value = getStorageUrl(path)
 }
 
@@ -375,19 +386,7 @@ const formatDate = (d: string) =>
                     "
                   >
                     <PhFilePdf :size="12" weight="bold" />
-                    PDS
-                  </button>
-                  <button
-                    @click="openDrawer(applicant, 'we')"
-                    class="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-lg border cursor-pointer transition-all"
-                    :class="
-                      drawerApplicant?.id === applicant.id && drawerDoc === 'we'
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'text-gray-500 bg-stone-50 border-stone-200 hover:bg-stone-100 hover:text-gray-800'
-                    "
-                  >
-                    <PhFilePdf :size="12" weight="bold" />
-                    WE
+                    View Documents
                   </button>
                 </div>
               </div>
@@ -463,6 +462,31 @@ const formatDate = (d: string) =>
                   >
                     <PhFilePdf :size="13" weight="bold" />
                     Work Experience
+                  </button>
+                  <button
+                    @click="switchDoc('bachelors')"
+                    class="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md transition-all"
+                    :class="
+                      drawerDoc === 'bachelors'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'bg-transparent text-gray-500 hover:text-gray-700'
+                    "
+                  >
+                    <PhFilePdf :size="13" weight="bold" />
+                    Bachelor's
+                  </button>
+
+                  <button
+                    @click="switchDoc('eligibility')"
+                    class="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md transition-all"
+                    :class="
+                      drawerDoc === 'eligibility'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'bg-transparent text-gray-500 hover:text-gray-700'
+                    "
+                  >
+                    <PhFilePdf :size="13" weight="bold" />
+                    Eligibility
                   </button>
                 </div>
 

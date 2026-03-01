@@ -5,4 +5,6 @@ export interface Applicant {
   appliedDate: string
   personalDataSheet: string
   workExperience: string
+  bachelorsDiploma: string
+  eligibilityCertificate: string
 }

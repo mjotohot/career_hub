@@ -14,6 +14,8 @@ export interface ApplicationFormData {
   eligiblity: string
   pdsFile: File | null
   wesFile: File | null
+  eligiblityFile: File | null
+  bachelorsFile: File | null
 }
 
 export interface ApplicationPayload extends ApplicationFormData {

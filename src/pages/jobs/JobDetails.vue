@@ -16,22 +16,22 @@ const emit = defineEmits<{
 // Generate unique ID for drawer toggle
 const drawerId = computed(() => `job-drawer-${props.job.job_id}`)
 
-const DOCUMENT_REQUIREMENTS = [
-  'Application/Cover Letter addressed to the CSU President Dr. Rolyn C. Daguil',
-  'One (1) copy of duly accomplished and Notarized Personal Data Sheet (Indicating education, experience and no. of hours of training/seminars)',
-  'Authenticated Copy Transcript of Records',
-  'Certificates of Relevant Trainings and Seminars attended',
-  'Certificates of Eligibility',
-  'Certificates of Employment',
-  'Work Experience Sheet',
-  'Performance rating in the last rating period (if applicable)',
-  'SSS/PHILHEALTH/PAG-IBIG/GSIS AND TAX IDENTIFICATION NUMBER',
-]
+// const DOCUMENT_REQUIREMENTS = [
+//   'Application/Cover Letter addressed to the CSU President Dr. Rolyn C. Daguil',
+//   'One (1) copy of duly accomplished and Notarized Personal Data Sheet (Indicating education, experience and no. of hours of training/seminars)',
+//   'Authenticated Copy Transcript of Records',
+//   'Certificates of Relevant Trainings and Seminars attended',
+//   'Certificates of Eligibility',
+//   'Certificates of Employment',
+//   'Work Experience Sheet',
+//   'Performance rating in the last rating period (if applicable)',
+//   'SSS/PHILHEALTH/PAG-IBIG/GSIS AND TAX IDENTIFICATION NUMBER',
+// ]
 
-const NAMING_CONVENTION_NOTE = `
-Folder name: (Family Name)_(Hiring Office)-(the position your applying)
-File name: (Family Name)_(Hiring Office)-(the position your applying)_(file to upload)
-`.trim()
+// const NAMING_CONVENTION_NOTE = `
+// Folder name: (Family Name)_(Hiring Office)-(the position your applying)
+// File name: (Family Name)_(Hiring Office)-(the position your applying)_(file to upload)
+// `.trim()
 </script>
 
 <template>
@@ -91,7 +91,7 @@ File name: (Family Name)_(Hiring Office)-(the position your applying)_(file to u
             </section>
           </div>
 
-          <div class="space-y-8 py-4">
+          <!-- <div class="space-y-8 py-4">
             <section class="p-6 bg-base-200/50 rounded-2xl border border-base-300/50">
               <h4 class="text-xs font-bold uppercase mb-2 opacity-50">
                 For the document screening, Kindly create your own Google Drive folder with the
@@ -107,7 +107,7 @@ File name: (Family Name)_(Hiring Office)-(the position your applying)_(file to u
                 </li>
               </ol>
             </section>
-          </div>
+          </div> -->
         </div>
 
         <div class="p-6 bg-base-200/30 border-t border-gray-200 flex gap-3">

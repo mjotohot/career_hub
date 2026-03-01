@@ -5,6 +5,8 @@ export async function jobApplicationService(formData: ApplicationPayload) {
   try {
     let pdsPath: string | null = null
     let wesPath: string | null = null
+    let bachelorsPath: string | null = null
+    let eligiblityPath: string | null = null
 
     if (formData.pdsFile) {
       const { data, error } = await supabase.storage
@@ -20,6 +22,22 @@ export async function jobApplicationService(formData: ApplicationPayload) {
         .upload(`wes/${crypto.randomUUID()}`, formData.wesFile)
       if (error) throw error
       wesPath = data.path
+    }
+
+    if (formData.bachelorsFile) {
+      const { data, error } = await supabase.storage
+        .from('applications')
+        .upload(`bachelors/${crypto.randomUUID()}`, formData.bachelorsFile)
+      if (error) throw error
+      bachelorsPath = data.path
+    }
+
+    if (formData.eligiblityFile) {
+      const { data, error } = await supabase.storage
+        .from('applications')
+        .upload(`eligibility/${crypto.randomUUID()}`, formData.eligiblityFile)
+      if (error) throw error
+      eligiblityPath = data.path
     }
 
     const { data: applicant, error: applicantError } = await supabase
@@ -63,6 +81,8 @@ export async function jobApplicationService(formData: ApplicationPayload) {
         city: formData.city,
         pds_file: pdsPath,
         wes_file: wesPath,
+        bachelors_file: bachelorsPath,
+        eligibility_file: eligiblityPath,
       })
       .select('application_id')
       .single()

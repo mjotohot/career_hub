@@ -22,6 +22,8 @@ export function useJobApplication(job: Job) {
     eligiblity: '',
     pdsFile: null,
     wesFile: null,
+    bachelorsFile: null,
+    eligiblityFile: null,
   }
 
   const formData = reactive<ApplicationFormData>({ ...initialFormData })
@@ -39,7 +41,7 @@ export function useJobApplication(job: Job) {
   const stepRequirements: Record<number, (keyof ApplicationFormData)[]> = {
     1: ['fullName', 'email', 'birthdate', 'mobileNumber', 'gender', 'region', 'province', 'city'],
     2: ['skills', 'education', 'experience', 'training', 'eligiblity'],
-    3: ['pdsFile', 'wesFile'],
+    3: ['pdsFile', 'wesFile', 'bachelorsFile', 'eligiblityFile'],
   }
 
   const isCurrentStepValid = computed(
