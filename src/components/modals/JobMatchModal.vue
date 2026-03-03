@@ -6,6 +6,7 @@ const props = defineProps<{
   isOpen: boolean
   status: 'loading' | 'pass' | 'fail' | null
   jobTitle?: string
+  reason?: string | null
 }>()
 
 const emit = defineEmits<{
@@ -89,6 +90,14 @@ const config = computed(() => {
         <p class="text-sm text-base-content/80 leading-relaxed px-2">
           {{ config?.message }}
         </p>
+
+        <div
+          v-if="status === 'fail' && reason"
+          class="text-xs text-left w-full bg-warning/10 border border-warning/30 rounded-lg px-3 py-2 text-base-content/70 leading-relaxed"
+        >
+          <p class="font-semibold text-warning mb-1">Unmet Qualifications:</p>
+          <p>{{ reason }}</p>
+        </div>
 
         <p v-if="jobTitle" class="text-xs text-base-content font-semibold mt-1">
           Applied Role: {{ jobTitle }}

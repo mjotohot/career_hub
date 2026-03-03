@@ -6,6 +6,7 @@ export async function saveGeminiMatchResult(applicationId: string, match: MatchR
     .from('applications')
     .update({
       match_status: match.status,
+      match_reason: match.reason ?? null,
       match_evaluated_at: new Date().toISOString(),
     })
     .eq('application_id', applicationId)

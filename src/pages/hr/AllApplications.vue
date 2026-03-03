@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import AdminLayout from '@/components/navigations/AdminLayout.vue'
+import InfoModal from '@/components/modals/InfoModal.vue'
 import { getAllApplications } from '@/services/applicant'
 import { ref, onMounted, computed } from 'vue'
 import { PhCheckCircle, PhXCircle, PhClock, PhMagnifyingGlass } from '@phosphor-icons/vue'
@@ -10,6 +11,7 @@ interface Application {
   pds_file: string
   wes_file: string
   match_status: string
+  match_reason: string | null
   job_id: string
   applicants: {
     applicant_id: string
@@ -76,6 +78,19 @@ const handleStatusChange = (status: 'all' | 'pass' | 'fail') => {
   fetchApplications(searchQuery.value, status)
 }
 
+const remarksModal = ref<{ isOpen: boolean; reason: string | null }>({
+  isOpen: false,
+  reason: null,
+})
+
+const openRemarks = (reason: string) => {
+  remarksModal.value = { isOpen: true, reason }
+}
+
+const closeRemarks = () => {
+  remarksModal.value = { isOpen: false, reason: null }
+}
+
 // HELPERS
 const formatDate = (d: string) =>
   new Date(d).toLocaleDateString('en-US', {
@@ -109,6 +124,12 @@ const getStatusBadge = (status: string) => {
 </script>
 
 <template>
+  <InfoModal
+    :is-open="remarksModal.isOpen"
+    title="Unmet Qualifications"
+    :message="remarksModal.reason ?? ''"
+    @close="closeRemarks"
+  />
   <AdminLayout>
     <div class="min-h-screen">
       <!-- Header -->
@@ -261,6 +282,11 @@ const getStatusBadge = (status: string) => {
               >
                 Status
               </th>
+              <th
+                class="px-6 py-3 text-left text-[10px] uppercase tracking-widest font-semibold text-gray-400"
+              >
+                Remarks
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -296,6 +322,16 @@ const getStatusBadge = (status: string) => {
                   <component :is="getStatusBadge(app.match_status).icon" :size="14" weight="bold" />
                   {{ getStatusBadge(app.match_status).label }}
                 </div>
+              </td>
+              <td class="px-6 py-4 text-sm">
+                <button
+                  v-if="app.match_status === 'fail' && app.match_reason"
+                  class="text-xs text-red-500 underline underline-offset-2 hover:text-red-700 transition-colors"
+                  @click="openRemarks(app.match_reason)"
+                >
+                  View Remarks
+                </button>
+                <span v-else class="text-xs text-gray-300">—</span>
               </td>
             </tr>
           </tbody>

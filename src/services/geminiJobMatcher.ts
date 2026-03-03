@@ -58,7 +58,7 @@ export async function assessJobMatch(
     ],
     generationConfig: {
       temperature: 0,
-      maxOutputTokens: 10,
+      maxOutputTokens: 150,
       responseMimeType: 'text/plain',
     },
   }
@@ -148,17 +148,51 @@ APPLICANT PROFILE:
 - Trainings / Seminars: ${applicantData.training || 'None provided'}
 
 INSTRUCTION:
-Evaluate whether the applicant meets the minimum qualifications. Respond with exactly one word only — no punctuation, no explanation:
-- "pass" if the applicant meets the minimum requirements
-- "fail" if the applicant does not meet the minimum requirements`
+Evaluate whether the applicant meets the minimum qualifications.
+Respond using this exact format and nothing else:
+
+RESULT: pass
+REMARKS: Applicant meets all minimum requirements.
+
+Or if failing:
+
+RESULT: fail
+REMARKS: <list the specific unmet qualifications, e.g. "Missing required eligibility. Work experience of X years is below the required Y years.">`
 }
+
+// function parseGeminiResponse(responseText: string): MatchResult {
+//   const cleaned = responseText.toLowerCase().trim()
+
+//   if (cleaned.includes('pass')) return { status: 'pass' }
+//   if (cleaned.includes('fail')) return { status: 'fail' }
+
+//   console.warn('Unexpected Gemini response format:', responseText)
+//   return { status: 'fail', reason: 'Unable to parse assessment result' }
+// }
 
 function parseGeminiResponse(responseText: string): MatchResult {
   const cleaned = responseText.toLowerCase().trim()
+  const original = responseText.trim()
 
-  if (cleaned.includes('pass')) return { status: 'pass' }
-  if (cleaned.includes('fail')) return { status: 'fail' }
+  // Extract RESULT line
+  const resultMatch = cleaned.match(/result:\s*(pass|fail)/)
+  // Extract REMARKS line (case-insensitive, grab rest of line)
+  const remarksMatch = original.match(/REMARKS:\s*(.+)/i)
 
+  const remarks = remarksMatch?.[1]?.trim()
+
+  if (resultMatch?.[1] === 'pass') {
+    return { status: 'pass', reason: remarks }
+  }
+
+  if (resultMatch?.[1] === 'fail') {
+    return {
+      status: 'fail',
+      reason: remarks ?? 'Applicant did not meet minimum qualifications.',
+    }
+  }
+
+  // Fallback for unexpected formats
   console.warn('Unexpected Gemini response format:', responseText)
   return { status: 'fail', reason: 'Unable to parse assessment result' }
 }

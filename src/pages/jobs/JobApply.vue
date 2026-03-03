@@ -19,6 +19,7 @@ const {
   isLoading,
   jobMatchModalOpen,
   jobMatchStatus,
+  jobMatchReason,
   steps,
   isCurrentStepValid,
   canSubmit,
@@ -62,6 +63,7 @@ const handleMatchModalClose = () => {
     :is-open="jobMatchModalOpen"
     :status="jobMatchStatus"
     :job-title="job.open_position"
+    :reason="jobMatchReason"
     @close="handleMatchModalClose"
   />
 

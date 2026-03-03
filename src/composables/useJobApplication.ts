@@ -31,6 +31,7 @@ export function useJobApplication(job: Job) {
   const isLoading = ref(false)
   const jobMatchModalOpen = ref(false)
   const jobMatchStatus = ref<'loading' | 'pass' | 'fail' | null>(null)
+  const jobMatchReason = ref<string | null>(null)
 
   const steps = [
     { id: 1, label: 'Personal' },
@@ -52,6 +53,7 @@ export function useJobApplication(job: Job) {
 
   const resetForm = () => {
     currentStep.value = 1
+    jobMatchReason.value = null
     Object.assign(formData, initialFormData)
   }
 
@@ -94,6 +96,7 @@ export function useJobApplication(job: Job) {
       )
 
       jobMatchStatus.value = matchResult.status === 'pass' ? 'pass' : 'fail'
+      jobMatchReason.value = matchResult.reason ?? null
       await saveGeminiMatchResult(result.applicationId, matchResult)
     } catch (error) {
       toast?.add('error', 'An unexpected error occurred. Please try again.')
@@ -111,6 +114,7 @@ export function useJobApplication(job: Job) {
     isLoading,
     jobMatchModalOpen,
     jobMatchStatus,
+    jobMatchReason,
     steps,
     isCurrentStepValid,
     canSubmit,

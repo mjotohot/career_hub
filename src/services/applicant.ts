@@ -35,6 +35,7 @@ export async function getAllApplications(status?: 'pass' | 'fail' | 'all', searc
       pds_file,
       wes_file,
       match_status,
+      match_reason,
       job_id,
       applicants (
         applicant_id,
