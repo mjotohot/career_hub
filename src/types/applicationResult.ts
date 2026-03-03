@@ -4,6 +4,7 @@ export interface ApplicationResult {
   pds_file: string
   wes_file: string
   match_status: string
+  match_reason: string | null
   applicants: {
     applicant_id: string
     full_name: string

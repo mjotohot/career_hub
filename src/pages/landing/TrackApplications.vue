@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'vue-router'
 import bgImage from '@/assets/images/csu1.jpg'
 import type { ApplicationResult } from '@/types/applicationResult'
+import InfoModal from '@/components/modals/InfoModal.vue'
 
 const router = useRouter()
 
@@ -82,9 +83,28 @@ const getStatusConfig = (status: string) => {
     icon: PhClock,
   }
 }
+
+const remarksModal = ref<{ isOpen: boolean; reason: string | null }>({
+  isOpen: false,
+  reason: null,
+})
+
+const openRemarks = (reason: string) => {
+  remarksModal.value = { isOpen: true, reason }
+}
+
+const closeRemarks = () => {
+  remarksModal.value = { isOpen: false, reason: null }
+}
 </script>
 
 <template>
+  <InfoModal
+    :is-open="remarksModal.isOpen"
+    title="Unmet Qualifications"
+    :message="remarksModal.reason ?? ''"
+    @close="closeRemarks"
+  />
   <div class="min-h-screen bg-stone-50 relative overflow-x-hidden">
     <div
       class="pointer-events-none fixed inset-0 z-0 overflow-hidden"
@@ -214,6 +234,11 @@ const getStatusConfig = (status: string) => {
                 >
                   Status
                 </th>
+                <th
+                  class="px-6 py-3 text-left text-[10px] uppercase tracking-widest font-semibold text-gray-400"
+                >
+                  Remarks
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -246,6 +271,16 @@ const getStatusConfig = (status: string) => {
                     />
                     {{ getStatusConfig(app.match_status).label }}
                   </span>
+                </td>
+                <td class="px-6 py-4 text-sm">
+                  <button
+                    v-if="app.match_status === 'fail' && app.match_reason"
+                    class="text-xs text-red-500 underline underline-offset-2 hover:text-red-700 transition-colors"
+                    @click="openRemarks(app.match_reason)"
+                  >
+                    View Remarks
+                  </button>
+                  <span v-else class="text-xs text-gray-300">—</span>
                 </td>
               </tr>
             </tbody>

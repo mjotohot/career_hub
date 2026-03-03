@@ -77,6 +77,7 @@ export async function getApplicationsByEmail(email: string) {
       pds_file,
       wes_file,
       match_status,
+      match_reason,
       applicants (
         applicant_id,
         full_name,
