@@ -17,6 +17,7 @@ const navigationItems = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: PhSquaresFour },
   { name: 'Jobs & Applicants', href: '/admin/jobs', icon: PhBriefcase },
   { name: 'Applications', href: '/admin/applications', icon: PhFileText },
+  { name: 'Add Jobs', href: '/admin/add', icon: PhFileText },
 ]
 
 function isActive(href: string): boolean {

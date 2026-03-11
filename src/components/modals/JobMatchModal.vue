@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { PhCheckCircle, PhWarningCircle, PhX } from '@phosphor-icons/vue'
+import { PhCheckCircle, PhWarningCircle, PhX, PhXCircle } from '@phosphor-icons/vue'
 
 const props = defineProps<{
   isOpen: boolean
-  status: 'loading' | 'pass' | 'fail' | null
+  status: 'loading' | 'pass' | 'fail' | 'partial' | null
   jobTitle?: string
   reason?: string | null
 }>()
@@ -39,16 +39,25 @@ const config = computed(() => {
           'Your qualifications align well with this position. The hiring team will review your application shortly.',
         // accentClass: 'border-success/30 bg-success/5',
       }
-    case 'fail':
+    case 'partial':
       return {
         icon: PhWarningCircle,
         iconClass: 'text-warning',
         badgeClass: 'badge-warning',
         badgeLabel: 'Partial Match',
-        title: 'Application Submitted',
+        title: 'Needs Further Review',
         message:
-          'Your qualifications may not fully match all requirements, but we still encourage you. The hiring team will review every application carefully.',
-        // accentClass: 'border-warning/30 bg-warning/5',
+          'You meet many requirements! Our team will take a closer look at your specific experience.',
+      }
+    case 'fail':
+      return {
+        icon: PhXCircle,
+        iconClass: 'text-error',
+        badgeClass: 'badge-error',
+        badgeLabel: 'Not Shortlisted',
+        title: 'Requirements Not Met',
+        message:
+          'Unfortunately, your profile does not meet the mandatory requirements for this specific role.',
       }
     default:
       return null

@@ -73,8 +73,8 @@ const getStatusConfig = (status: string) => {
     }
   if (status === 'fail')
     return {
-      wrapClass: 'bg-rose-50 text-rose-600 border border-rose-200',
-      label: 'Failed',
+      wrapClass: 'bg-yellow-50 text-yellow-600 border border-yellow-200',
+      label: 'Under Review',
       icon: PhXCircle,
     }
   return {
@@ -105,7 +105,7 @@ const closeRemarks = () => {
     :message="remarksModal.reason ?? ''"
     @close="closeRemarks"
   />
-  <div class="min-h-screen bg-stone-50 relative overflow-x-hidden">
+  <div class="bg-stone-50 relative overflow-x-hidden">
     <div
       class="pointer-events-none fixed inset-0 z-0 overflow-hidden"
       :style="{
@@ -275,7 +275,7 @@ const closeRemarks = () => {
                 <td class="px-6 py-4 text-sm">
                   <button
                     v-if="app.match_status === 'fail' && app.match_reason"
-                    class="text-xs text-red-500 underline underline-offset-2 hover:text-red-700 transition-colors"
+                    class="text-xs text-yellow-500 underline underline-offset-2 hover:text-yellow-700 transition-colors"
                     @click="openRemarks(app.match_reason)"
                   >
                     View Remarks

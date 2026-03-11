@@ -109,9 +109,9 @@ const getStatusBadge = (status: string) => {
     }
   if (status === 'fail')
     return {
-      bg: 'bg-red-100',
-      text: 'text-red-600',
-      label: 'Failed',
+      bg: 'bg-yellow-100',
+      text: 'text-yellow-600',
+      label: 'Under Review',
       icon: PhXCircle,
     }
   return {
@@ -311,9 +311,9 @@ const getStatusBadge = (status: string) => {
               <td class="px-6 py-4 text-sm text-gray-500">
                 {{ formatDate(app.applied_at) }}
               </td>
-              <td class="px-6 py-4">
+              <td class="py-4">
                 <div
-                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium"
+                  class="flex justify-center gap-2 p-4 px-3 py-1 rounded-full items-center text-xs font-medium"
                   :class="[
                     getStatusBadge(app.match_status).bg,
                     getStatusBadge(app.match_status).text,
@@ -323,10 +323,10 @@ const getStatusBadge = (status: string) => {
                   {{ getStatusBadge(app.match_status).label }}
                 </div>
               </td>
-              <td class="px-6 py-4 text-sm">
+              <td class="px-8 py-4 text-sm">
                 <button
                   v-if="app.match_status === 'fail' && app.match_reason"
-                  class="text-xs text-red-500 underline underline-offset-2 hover:text-red-700 transition-colors"
+                  class="text-xs text-yellow-500 underline underline-offset-2 hover:text-yellow-700 transition-colors"
                   @click="openRemarks(app.match_reason)"
                 >
                   View Remarks

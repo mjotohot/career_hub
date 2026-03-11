@@ -15,12 +15,4 @@ export interface Job {
   other_qualifications: string
   created_at: string
   status: 'open' | 'closed'
-  // date_of_request: string
-  // expected_term_of_service: string
-  // request_id: number
-  // fund_source: string
-  // gov_exam_passed: 'Yes' | 'No'
-  // form_type: string
-  // requisition_type: string
-  // item_no: string
 }

@@ -2,7 +2,7 @@ import type { Job } from '@/types/jobs'
 import type { ApplicationFormData } from '@/types/applyform'
 
 export interface MatchResult {
-  status: 'pass' | 'fail'
+  status: 'pass' | 'fail' | 'partial'
   reason?: string
 }
 
@@ -43,11 +43,33 @@ export async function assessJobMatch(
   job: Job,
   applicantData: ApplicationFormData,
   apiKey: string,
+  pdsFile: File | null,
+  wesFile: File | null,
 ): Promise<MatchResult> {
   if (!apiKey) {
     console.error('Gemini API key is missing')
     return { status: 'fail', reason: 'API key is not configured' }
   }
+
+  // convert File to Base64
+  const fileToGenerativePart = async (file: File) => {
+    const base64 = await new Promise<string>((resolve) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve((reader.result as string).split(',')[1])
+      reader.readAsDataURL(file)
+    })
+    return {
+      inline_data: {
+        data: base64,
+        mime_type: file.type,
+      },
+    }
+  }
+
+  const parts: any[] = [{ text: buildMatchingPrompt(job, applicantData) }]
+
+  if (pdsFile) parts.push(await fileToGenerativePart(pdsFile))
+  if (wesFile) parts.push(await fileToGenerativePart(wesFile))
 
   const requestBody: GeminiRequestBody = {
     contents: [
@@ -147,6 +169,10 @@ APPLICANT PROFILE:
 - Skills: ${applicantData.skills}
 - Trainings / Seminars: ${applicantData.training || 'None provided'}
 
+ADDITIONAL DOCUMENTS ATTACHED:
+- I have provided the applicant's PDS (Personal Data Sheet) and WES (Work Experience Sheet) as attachments.
+- Please cross-reference the Education and Experience listed in the profile with the official details in these documents to ensure accuracy.
+
 INSTRUCTION:
 Evaluate whether the applicant meets the minimum qualifications.
 Respond using this exact format and nothing else:
@@ -154,28 +180,22 @@ Respond using this exact format and nothing else:
 RESULT: pass
 REMARKS: Applicant meets all minimum requirements.
 
-Or if failing:
+OR if they meet most but miss 1-2 minor non-mandatory requirements:
+RESULT: partial
+REMARKS: List the specific unmet qualifications. Example: Missing required eligibility. Work experience of X years is below required Y years.
 
+OR if they clearly fail core requirements:
 RESULT: fail
-REMARKS: <list the specific unmet qualifications, e.g. "Missing required eligibility. Work experience of X years is below the required Y years.">`
+REMARKS: Explain which core qualifications do not match.
+`
 }
-
-// function parseGeminiResponse(responseText: string): MatchResult {
-//   const cleaned = responseText.toLowerCase().trim()
-
-//   if (cleaned.includes('pass')) return { status: 'pass' }
-//   if (cleaned.includes('fail')) return { status: 'fail' }
-
-//   console.warn('Unexpected Gemini response format:', responseText)
-//   return { status: 'fail', reason: 'Unable to parse assessment result' }
-// }
 
 function parseGeminiResponse(responseText: string): MatchResult {
   const cleaned = responseText.toLowerCase().trim()
   const original = responseText.trim()
 
   // Extract RESULT line
-  const resultMatch = cleaned.match(/result:\s*(pass|fail)/)
+  const resultMatch = cleaned.match(/result:\s*(pass|fail|partial)/)
   // Extract REMARKS line (case-insensitive, grab rest of line)
   const remarksMatch = original.match(/REMARKS:\s*(.+)/i)
 
@@ -183,6 +203,10 @@ function parseGeminiResponse(responseText: string): MatchResult {
 
   if (resultMatch?.[1] === 'pass') {
     return { status: 'pass', reason: remarks }
+  }
+
+  if (resultMatch?.[1] === 'partial') {
+    return { status: 'partial', reason: remarks }
   }
 
   if (resultMatch?.[1] === 'fail') {

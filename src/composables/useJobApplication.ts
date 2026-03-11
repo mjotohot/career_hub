@@ -4,6 +4,8 @@ import type { ApplicationFormData, ApplicationPayload } from '@/types/applyform'
 import { jobApplicationService } from '@/services/jobApplication'
 import { assessJobMatch } from '@/services/geminiJobMatcher'
 import { saveGeminiMatchResult } from '@/services/jobMatchService'
+import { sendScreeningEmail } from '@/services/emailService'
+import { ScreeningStatus } from '@/types/email'
 
 export function useJobApplication(job: Job) {
   const initialFormData: ApplicationFormData = {
@@ -30,7 +32,7 @@ export function useJobApplication(job: Job) {
   const currentStep = ref(1)
   const isLoading = ref(false)
   const jobMatchModalOpen = ref(false)
-  const jobMatchStatus = ref<'loading' | 'pass' | 'fail' | null>(null)
+  const jobMatchStatus = ref<'loading' | 'pass' | 'fail' | 'partial' | null>(null)
   const jobMatchReason = ref<string | null>(null)
 
   const steps = [
@@ -83,6 +85,9 @@ export function useJobApplication(job: Job) {
         return
       }
 
+      const recipientEmail = formData.email
+      const recipientName = formData.fullName
+
       const applicantSnapshot = { ...formData }
       resetForm()
 
@@ -93,11 +98,28 @@ export function useJobApplication(job: Job) {
         job,
         applicantSnapshot,
         import.meta.env.VITE_GEMINI_API_KEY,
+        applicantSnapshot.pdsFile,
+        applicantSnapshot.wesFile,
       )
 
-      jobMatchStatus.value = matchResult.status === 'pass' ? 'pass' : 'fail'
+      const { error: updateError } = await saveGeminiMatchResult(result.applicationId, matchResult)
+      if (updateError) throw updateError
+
+      const emailStatusMap: Record<string, ScreeningStatus> = {
+        pass: 'passed',
+        partial: 'partial',
+        fail: 'failed',
+      }
+
+      await sendScreeningEmail({
+        full_name: recipientName,
+        email: recipientEmail,
+        open_position: job.open_position,
+        match_status: emailStatusMap[matchResult.status],
+      })
+
+      jobMatchStatus.value = matchResult.status
       jobMatchReason.value = matchResult.reason ?? null
-      await saveGeminiMatchResult(result.applicationId, matchResult)
     } catch (error) {
       toast?.add('error', 'An unexpected error occurred. Please try again.')
       console.error('Application submission error:', error)

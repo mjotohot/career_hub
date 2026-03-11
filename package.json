@@ -11,6 +11,7 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@fontsource/roboto": "^5.2.9",
     "@phosphor-icons/vue": "^2.2.1",
     "@supabase/supabase-js": "^2.93.3",

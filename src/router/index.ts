@@ -5,6 +5,7 @@ import DashboardPage from '@/pages/hr/DashboardPage.vue'
 import JobApplications from '@/pages/hr/JobApplications.vue'
 import AllApplications from '@/pages/hr/AllApplications.vue'
 import TrackApplications from '@/pages/landing/TrackApplications.vue'
+import AddJobs from '@/pages/hr/AddJobs.vue'
 import { useAuthStore, waitForAuthInit } from '@/stores/useAuthStore'
 
 const router = createRouter({
@@ -42,6 +43,12 @@ const router = createRouter({
       path: '/track',
       name: 'track',
       component: TrackApplications,
+    },
+    {
+      path: '/admin/add',
+      name: 'add-jobs',
+      component: AddJobs,
+      meta: { requiresAdmin: true },
     },
   ],
 })
