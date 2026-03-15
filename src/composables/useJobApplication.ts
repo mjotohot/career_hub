@@ -100,6 +100,8 @@ export function useJobApplication(job: Job) {
         import.meta.env.VITE_GEMINI_API_KEY,
         applicantSnapshot.pdsFile,
         applicantSnapshot.wesFile,
+        applicantSnapshot.bachelorsFile,
+        applicantSnapshot.eligiblityFile,
       )
 
       const { error: updateError } = await saveGeminiMatchResult(result.applicationId, matchResult)

@@ -45,6 +45,8 @@ export async function assessJobMatch(
   apiKey: string,
   pdsFile: File | null,
   wesFile: File | null,
+  eligiblityFile: File | null,
+  bachelorsFile: File | null,
 ): Promise<MatchResult> {
   if (!apiKey) {
     console.error('Gemini API key is missing')
@@ -70,6 +72,8 @@ export async function assessJobMatch(
 
   if (pdsFile) parts.push(await fileToGenerativePart(pdsFile))
   if (wesFile) parts.push(await fileToGenerativePart(wesFile))
+  if (eligiblityFile) parts.push(await fileToGenerativePart(eligiblityFile))
+  if (bachelorsFile) parts.push(await fileToGenerativePart(bachelorsFile))
 
   const requestBody: GeminiRequestBody = {
     contents: [
@@ -170,7 +174,7 @@ APPLICANT PROFILE:
 - Trainings / Seminars: ${applicantData.training || 'None provided'}
 
 ADDITIONAL DOCUMENTS ATTACHED:
-- I have provided the applicant's PDS (Personal Data Sheet) and WES (Work Experience Sheet) as attachments.
+- I have provided the applicant's PDS (Personal Data Sheet), WES (Work Experience Sheet), Eligibility Certificate, and Bachelor's Degree as attachments.
 - Please cross-reference the Education and Experience listed in the profile with the official details in these documents to ensure accuracy.
 
 INSTRUCTION:
