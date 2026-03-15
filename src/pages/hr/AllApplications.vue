@@ -1,34 +1,15 @@
 <script lang="ts" setup>
 import AdminLayout from '@/components/navigations/AdminLayout.vue'
 import InfoModal from '@/components/modals/InfoModal.vue'
+import type { Application } from '@/types/all'
+import { formatDate } from '@/utils/formatJobDate'
 import { getAllApplications } from '@/services/applicant'
 import { ref, onMounted, computed } from 'vue'
 import { PhCheckCircle, PhXCircle, PhClock, PhMagnifyingGlass } from '@phosphor-icons/vue'
 
-interface Application {
-  application_id: string
-  applied_at: string
-  pds_file: string
-  wes_file: string
-  match_status: string
-  match_reason: string | null
-  job_id: string
-  applicants: {
-    applicant_id: string
-    full_name: string
-    email: string
-  }
-  jobs: {
-    job_id: string
-    open_position: string
-    campus: string
-    department_unit: string
-  }
-}
-
 // STATE
 const applications = ref<Application[]>([])
-const statusFilter = ref<'all' | 'pass' | 'fail'>('all')
+const statusFilter = ref<'all' | 'pass' | 'partial' | 'fail'>('all')
 const searchQuery = ref('')
 const isLoading = ref(false)
 
@@ -38,8 +19,9 @@ const filteredApplications = computed(() => applications.value)
 const stats = computed(() => {
   const total = applications.value.length
   const passed = applications.value.filter((app) => app.match_status === 'pass').length
+  const underReview = applications.value.filter((app) => app.match_status === 'partial').length
   const failed = applications.value.filter((app) => app.match_status === 'fail').length
-  return { total, passed, failed }
+  return { total, passed, underReview, failed }
 })
 
 // FETCH DATA
@@ -51,7 +33,7 @@ const fetchApplications = async (query?: string, status?: string) => {
   isLoading.value = true
   try {
     const data = await getAllApplications(
-      (status || statusFilter.value) as 'all' | 'pass' | 'fail',
+      (status || statusFilter.value) as 'all' | 'pass' | 'partial' | 'fail',
       query || searchQuery.value,
     )
     applications.value = Array.isArray(data) ? data : []
@@ -73,7 +55,7 @@ const handleSearch = (query: string) => {
 }
 
 // Handle status filter change
-const handleStatusChange = (status: 'all' | 'pass' | 'fail') => {
+const handleStatusChange = (status: 'all' | 'pass' | 'partial' | 'fail') => {
   statusFilter.value = status
   fetchApplications(searchQuery.value, status)
 }
@@ -91,35 +73,14 @@ const closeRemarks = () => {
   remarksModal.value = { isOpen: false, reason: null }
 }
 
-// HELPERS
-const formatDate = (d: string) =>
-  new Date(d).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-
 const getStatusBadge = (status: string) => {
   if (status === 'pass')
-    return {
-      bg: 'bg-emerald-100',
-      text: 'text-emerald-600',
-      label: 'Passed',
-      icon: PhCheckCircle,
-    }
+    return { bg: 'bg-emerald-100', text: 'text-emerald-600', label: 'Passed', icon: PhCheckCircle }
+  if (status === 'partial')
+    return { bg: 'bg-yellow-100', text: 'text-yellow-600', label: 'Under Review', icon: PhClock }
   if (status === 'fail')
-    return {
-      bg: 'bg-yellow-100',
-      text: 'text-yellow-600',
-      label: 'Under Review',
-      icon: PhXCircle,
-    }
-  return {
-    bg: 'bg-gray-100',
-    text: 'text-gray-600',
-    label: 'Pending',
-    icon: PhClock,
-  }
+    return { bg: 'bg-red-100', text: 'text-red-600', label: 'Failed', icon: PhXCircle }
+  return { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Pending', icon: PhClock }
 }
 </script>
 
@@ -143,7 +104,7 @@ const getStatusBadge = (status: string) => {
       </div>
 
       <!-- Stats -->
-      <div class="mb-6 grid grid-cols-3 gap-4">
+      <div class="mb-6 grid grid-cols-4 gap-4">
         <div class="bg-white rounded-lg border border-stone-200 p-4">
           <div class="text-xs text-gray-400 uppercase tracking-widest">Total Applications</div>
           <div class="text-2xl font-bold text-gray-900 mt-1">{{ stats.total }}</div>
@@ -151,6 +112,10 @@ const getStatusBadge = (status: string) => {
         <div class="bg-white rounded-lg border border-stone-200 p-4">
           <div class="text-xs text-gray-400 uppercase tracking-widest">Passed</div>
           <div class="text-2xl font-bold text-emerald-600 mt-1">{{ stats.passed }}</div>
+        </div>
+        <div class="bg-white rounded-lg border border-stone-200 p-4">
+          <div class="text-xs text-gray-400 uppercase tracking-widest">Under Review</div>
+          <div class="text-2xl font-bold text-yellow-500 mt-1">{{ stats.underReview }}</div>
         </div>
         <div class="bg-white rounded-lg border border-stone-200 p-4">
           <div class="text-xs text-gray-400 uppercase tracking-widest">Failed</div>

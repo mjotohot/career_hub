@@ -5,7 +5,15 @@ import { useAuthStore } from '@/stores/useAuthStore'
 import AppConfirmModal from '@/components/modals/AppConfirmModal.vue'
 import csuLogo from '@/assets/images/logo.png'
 import navImage from '@/assets/images/navbar.svg'
-import { PhList, PhX, PhSquaresFour, PhBriefcase, PhFileText, PhSignOut } from '@phosphor-icons/vue'
+import {
+  PhList,
+  PhX,
+  PhSquaresFour,
+  PhBriefcase,
+  PhFileText,
+  PhSignOut,
+  PhPlusSquare,
+} from '@phosphor-icons/vue'
 
 const sidebarOpen = ref(true)
 const showLogoutConfirm = ref(false)
@@ -17,7 +25,7 @@ const navigationItems = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: PhSquaresFour },
   { name: 'Jobs & Applicants', href: '/admin/jobs', icon: PhBriefcase },
   { name: 'Applications', href: '/admin/applications', icon: PhFileText },
-  { name: 'Add Jobs', href: '/admin/add', icon: PhFileText },
+  { name: 'Add Jobs', href: '/admin/add', icon: PhPlusSquare },
 ]
 
 function isActive(href: string): boolean {
@@ -87,7 +95,7 @@ const handleLogout = () => {
             isActive(item.href) && 'bg-white/20 text-white',
           ]"
         >
-          <component :is="item.icon" class="h-5 w-5 shrink-0" />
+          <component :is="item.icon" weight="bold" size="20" />
           <span v-if="sidebarOpen" class="truncate">
             {{ item.name }}
           </span>
