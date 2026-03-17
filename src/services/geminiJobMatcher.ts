@@ -178,19 +178,30 @@ ADDITIONAL DOCUMENTS ATTACHED:
 - Please cross-reference the Education and Experience listed in the profile with the official details in these documents to ensure accuracy.
 
 INSTRUCTION:
-Evaluate whether the applicant meets the minimum qualifications.
+Evaluate whether the applicant meets the minimum qualifications using the criteria below.
+
+EVALUATION CRITERIA:
+
+PASS — Applicant meets the required education, eligibility, and most experience requirements. Skills and experience are clearly aligned with the position.
+
+PARTIAL — Applicant does NOT fully meet all requirements BUT shows related or transferable background. Education, experience, or skills are in a related field. The applicant could potentially perform the job with additional training. Minor requirement gaps such as slightly lower experience or missing non-mandatory training should also be PARTIAL.
+Examples: IT staff applying for HR officer, administrative staff applying for office positions.
+
+FAIL — Applicant background is completely unrelated to the job. Missing core qualifications such as required degree field, eligibility, or essential experience.
+Example: IT developer applying for nurse position.
+
 Respond using this exact format and nothing else:
 
 RESULT: pass
 REMARKS: Applicant meets all minimum requirements.
 
-OR if they meet most but miss 1-2 minor non-mandatory requirements:
+OR if they meet most requirements but have related/transferable background or minor gaps:
 RESULT: partial
-REMARKS: List the specific unmet qualifications. Example: Missing required eligibility. Work experience of X years is below required Y years.
+REMARKS: Briefly explain what is met and what is lacking or transferable. Example: Applicant has a related IT background but is applying for an HR role — core skills are transferable with additional training. Missing required eligibility.
 
 OR if they clearly fail core requirements:
 RESULT: fail
-REMARKS: Explain which core qualifications do not match.
+REMARKS: Explain which core qualifications are missing or unrelated.
 `
 }
 
