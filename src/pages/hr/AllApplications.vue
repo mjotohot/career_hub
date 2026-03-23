@@ -176,6 +176,19 @@ const getStatusBadge = (status: string) => {
         >
           Passed
         </button>
+        <!-- PARTIAL -->
+        <button
+          @click="handleStatusChange('partial')"
+          :class="[
+            'px-4 py-2 rounded-lg text-sm font-medium transition-all border',
+            statusFilter === 'partial'
+              ? 'bg-yellow-500 text-white border-yellow-500'
+              : 'bg-white text-gray-700 border-stone-200 hover:border-stone-300',
+          ]"
+          :disabled="isLoading"
+        >
+          Under Review
+        </button>
         <button
           @click="handleStatusChange('fail')"
           :class="[
@@ -276,7 +289,7 @@ const getStatusBadge = (status: string) => {
               <td class="px-6 py-4 text-sm text-gray-500">
                 {{ formatDate(app.applied_at) }}
               </td>
-              <td class="py-4">
+              <td class="py-4 px-6">
                 <div
                   class="flex justify-center gap-2 p-4 px-3 py-1 rounded-full items-center text-xs font-medium"
                   :class="[
@@ -288,16 +301,17 @@ const getStatusBadge = (status: string) => {
                   {{ getStatusBadge(app.match_status).label }}
                 </div>
               </td>
-              <td class="px-8 py-4 text-sm">
-                <button
-                  v-if="app.match_status === 'fail' && app.match_reason"
-                  class="text-xs text-yellow-500 underline underline-offset-2 hover:text-yellow-700 transition-colors"
-                  @click="openRemarks(app.match_reason)"
-                >
-                  View Remarks
-                </button>
-                <span v-else class="text-xs text-gray-300">—</span>
-              </td>
+              <button
+                v-if="
+                  (app.match_status === 'fail' || app.match_status === 'partial') &&
+                  app.match_reason
+                "
+                class="text-xs py-8 px-4 text-yellow-500 underline underline-offset-2 hover:text-yellow-700"
+                @click="openRemarks(app.match_reason)"
+              >
+                View Remarks
+              </button>
+              <span v-else class="text-xs px-6 py-4 text-gray-300">—</span>
             </tr>
           </tbody>
         </table>

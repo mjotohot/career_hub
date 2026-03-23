@@ -44,7 +44,7 @@ const fetchJobs = async (query?: string, campus?: string) => {
   try {
     const [jobsData, applicationRows] = await Promise.all([
       getJobs(query, campus),
-      getApplicationsByStatus('pass'),
+      getApplicationsByStatus(['pass', 'partial']),
     ])
 
     jobs.value = jobsData
@@ -328,13 +328,14 @@ const formatDate = (d: string) =>
               <!-- Table Head -->
               <div
                 class="grid items-center px-6 py-2.5 bg-stone-50 border-b border-stone-100"
-                style="grid-template-columns: 2.5rem 1fr 10rem 12rem"
+                style="grid-template-columns: 2.5rem 1fr 8rem 8rem 12rem"
               >
                 <span class="text-[10px] uppercase tracking-widest text-gray-400">#</span>
                 <span class="text-[10px] uppercase tracking-widest text-gray-400">Applicant</span>
                 <span class="text-[10px] uppercase tracking-widest text-gray-400"
                   >Date Applied</span
                 >
+                <span class="text-[10px] uppercase tracking-widest text-gray-400">Status</span>
                 <span class="text-[10px] uppercase tracking-widest text-gray-400">Documents</span>
               </div>
 
@@ -346,7 +347,7 @@ const formatDate = (d: string) =>
                 :class="
                   drawerApplicant?.id === applicant.id ? 'bg-blue-50' : 'hover:bg-stone-50/70'
                 "
-                style="grid-template-columns: 2.5rem 1fr 10rem 12rem"
+                style="grid-template-columns: 2.5rem 1fr 8rem 8rem 12rem"
               >
                 <span class="text-xs text-gray-300 select-none">
                   {{ String(index + 1).padStart(2, '0') }}
@@ -374,6 +375,17 @@ const formatDate = (d: string) =>
                 <span class="text-xs font-mono text-gray-400">{{
                   formatDate(applicant.appliedDate)
                 }}</span>
+
+                <span
+                  class="text-[11px] font-semibold px-2 py-1 rounded-full w-fit"
+                  :class="
+                    applicant.status === 'pass'
+                      ? 'bg-emerald-100 text-emerald-600'
+                      : 'bg-amber-100 text-amber-600'
+                  "
+                >
+                  {{ applicant.status }}
+                </span>
 
                 <div class="flex items-center gap-2">
                   <button

@@ -79,7 +79,8 @@ export async function assessJobMatch(
     contents: [
       {
         role: 'user',
-        parts: [{ text: buildMatchingPrompt(job, applicantData) }],
+        // parts: [{ text: buildMatchingPrompt(job, applicantData) }],
+        parts,
       },
     ],
     generationConfig: {

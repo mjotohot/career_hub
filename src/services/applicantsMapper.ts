@@ -12,6 +12,7 @@ export function mapApplicationsByJob(rows: any[]): Record<string, Applicant[]> {
       id: row.id,
       name: `${row.applicants.full_name}`,
       email: row.applicants.email,
+      status: row.match_status,
       appliedDate: row.applied_at,
       personalDataSheet: row.pds_file,
       workExperience: row.wes_file,

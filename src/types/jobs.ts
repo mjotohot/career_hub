@@ -5,7 +5,7 @@ export interface Job {
   open_position: string
   job_desc: string
   number_of_slots: number
-  position_type: 'Full-Time' | 'COS'
+  position_type: 'Full-Time' | 'Contract of Service'
   salary_grade: number
   salary_rate: string
   education_desired: string

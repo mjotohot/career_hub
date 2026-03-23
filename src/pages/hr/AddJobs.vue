@@ -13,7 +13,7 @@ const STATUS_OPTIONS = [
   { label: 'Open', value: 'open' },
   { label: 'Closed', value: 'closed' },
 ]
-const POSITION_TYPES = ['Full-Time', 'COS'] as const
+const POSITION_TYPES = ['Full-Time', 'Contract of Service'] as const
 
 const {
   formData,

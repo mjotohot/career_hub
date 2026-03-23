@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { Job } from '@/types/jobs'
 import { useJobApplication } from '@/composables/useJobApplication'
 import AppFormField from '@/components/inputs/AppFormField.vue'
@@ -30,6 +30,60 @@ const {
 } = useJobApplication(props.job)
 
 const showCloseConfirm = ref(false)
+
+const regions = [
+  { label: 'NCR', value: 'NCR' },
+  { label: 'CAR', value: 'CAR' },
+  { label: 'Region I - Ilocos', value: 'Region I' },
+  { label: 'Region II - Cagayan Valley', value: 'Region II' },
+  { label: 'Region III - Central Luzon', value: 'Region III' },
+  { label: 'Region IV-A - CALABARZON', value: 'Region IV-A' },
+  { label: 'Region IV-B - MIMAROPA', value: 'Region IV-B' },
+  { label: 'Region V - Bicol', value: 'Region V' },
+  { label: 'Region VI - Western Visayas', value: 'Region VI' },
+  { label: 'Region VII - Central Visayas', value: 'Region VII' },
+  { label: 'Region VIII - Eastern Visayas', value: 'Region VIII' },
+  { label: 'Region IX - Zamboanga', value: 'Region IX' },
+  { label: 'Region X - Northern Mindanao', value: 'Region X' },
+  { label: 'Region XI - Davao', value: 'Region XI' },
+  { label: 'Region XII - SOCCSKSARGEN', value: 'Region XII' },
+  { label: 'Region XIII - Caraga', value: 'Region XIII' },
+  { label: 'BARMM', value: 'BARMM' },
+  { label: 'NIR', value: 'NIR' },
+]
+
+const provincesByRegion: Record<string, string[]> = {
+  'Region XI': [
+    'Davao de Oro',
+    'Davao del Norte',
+    'Davao del Sur',
+    'Davao Occidental',
+    'Davao Oriental',
+  ],
+  'Region X': ['Bukidnon', 'Camiguin', 'Lanao del Norte', 'Misamis Occidental', 'Misamis Oriental'],
+  'Region XIII': [
+    'Agusan del Norte',
+    'Agusan del Sur',
+    'Dinagat Islands',
+    'Surigao del Norte',
+    'Surigao del Sur',
+  ],
+  'Region XII': ['Cotabato', 'Sarangani', 'South Cotabato', 'Sultan Kudarat'],
+  'Region VII': ['Bohol', 'Cebu', 'Negros Oriental', 'Siquijor'],
+  'Region VI': ['Aklan', 'Antique', 'Capiz', 'Guimaras', 'Iloilo', 'Negros Occidental'],
+  'Region V': ['Albay', 'Camarines Norte', 'Camarines Sur', 'Catanduanes', 'Masbate', 'Sorsogon'],
+  'Region IV-A': ['Batangas', 'Cavite', 'Laguna', 'Quezon', 'Rizal'],
+  'Region III': ['Aurora', 'Bataan', 'Bulacan', 'Nueva Ecija', 'Pampanga', 'Tarlac', 'Zambales'],
+  'Region II': ['Batanes', 'Cagayan', 'Isabela', 'Nueva Vizcaya', 'Quirino'],
+  'Region I': ['Ilocos Norte', 'Ilocos Sur', 'La Union', 'Pangasinan'],
+  CAR: ['Abra', 'Apayao', 'Benguet', 'Ifugao', 'Kalinga', 'Mountain Province'],
+  BARMM: ['Basilan', 'Lanao del Sur', 'Maguindanao', 'Sulu', 'Tawi-Tawi'],
+}
+
+const provinceOptions = computed(() => {
+  const list = provincesByRegion[formData.region] || []
+  return list.map((p) => ({ label: p, value: p }))
+})
 
 const handleClose = () => {
   showCloseConfirm.value = true
@@ -129,20 +183,14 @@ const handleMatchModalClose = () => {
               v-model="formData.region"
               label="Region"
               type="select"
-              :options="[
-                { label: 'Region 1', value: 'Region 1' },
-                { label: 'Region 2', value: 'Region 2' },
-              ]"
+              :options="regions"
               required
             />
             <AppFormField
               v-model="formData.province"
               label="Province"
               type="select"
-              :options="[
-                { label: 'Province 1', value: 'Province 1' },
-                { label: 'Province 2', value: 'Province 2' },
-              ]"
+              :options="provinceOptions"
               required
             />
           </div>

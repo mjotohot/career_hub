@@ -1,12 +1,13 @@
 import { supabase } from '@/services/supabase'
 
-export async function getApplicationsByStatus(match_status: 'pass' | 'fail') {
+export async function getApplicationsByStatus(match_status: ('pass' | 'partial' | 'fail')[]) {
   const { data, error } = await supabase
     .from('applications')
     .select(
       `
       application_id,
       applied_at,
+      match_status,
       pds_file,
       wes_file,
       eligibility_file,
@@ -19,7 +20,7 @@ export async function getApplicationsByStatus(match_status: 'pass' | 'fail') {
       )
     `,
     )
-    .eq('match_status', match_status)
+    .in('match_status', match_status)
 
   console.log('Applications by status:', data, error)
 
