@@ -19,6 +19,11 @@ const getStatusContent = (match_status: ScreeningStatus) => {
         steps:
           "Thank you for your interest. After reviewing your qualifications against the mandatory requirements, we have decided to move forward with other candidates whose profiles more closely align with the position's needs.",
       }
+    case 'partial':
+      return {
+        outcome: 'Partial Match',
+        steps: 'Your application meets some requirements but requires further review.',
+      }
     default:
       return {
         outcome: 'Pending Review',

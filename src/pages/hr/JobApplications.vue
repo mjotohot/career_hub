@@ -67,8 +67,11 @@ const handleSearch = (query: string) => {
 }
 
 const handleExport = async (job_id: string) => {
-  const data = await getApplicationsForExport(job_id, 'pass')
-  exportApplicantsPDF(data)
+  const [passed, partial] = await Promise.all([
+    getApplicationsForExport(job_id, 'passed'),
+    getApplicationsForExport(job_id, 'partial'),
+  ])
+  exportApplicantsPDF([...passed, ...partial])
 }
 
 // Handle campus filter change

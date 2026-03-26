@@ -2,7 +2,10 @@ import { supabase } from '@/services/supabase'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-export async function getApplicationsForExport(job_id: string, match_status?: 'pass' | 'fail') {
+export async function getApplicationsForExport(
+  job_id: string,
+  match_status?: 'passed' | 'failed' | 'partial',
+) {
   let query = supabase
     .from('applications')
     .select(
