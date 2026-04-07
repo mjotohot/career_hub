@@ -47,9 +47,23 @@ export function useJobApplication(job: Job) {
     3: ['pdsFile', 'wesFile', 'bachelorsFile', 'eligiblityFile'],
   }
 
-  const isCurrentStepValid = computed(
-    () => stepRequirements[currentStep.value]?.every((key) => Boolean(formData[key])) ?? false,
-  )
+  const isValidEmail = (email: string): boolean => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  const isCurrentStepValid = computed(() => {
+    const requiredFields = stepRequirements[currentStep.value] ?? []
+
+    return requiredFields.every((key) => {
+      const value = formData[key]
+
+      if (key === 'email') {
+        return isValidEmail(value as string)
+      }
+
+      return Boolean(value)
+    })
+  })
 
   const canSubmit = computed(() => currentStep.value === 3 && isCurrentStepValid.value)
 

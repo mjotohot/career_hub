@@ -24,6 +24,7 @@ import {
 // STATE (what the template reads)
 const jobs = ref<Job[]>([])
 const applicantsByJob = ref<Record<string, Applicant[]>>({})
+const allApplicationsByJob = ref<Record<string, Applicant[]>>({})
 const searchQuery = ref('')
 const selectedCampus = ref('')
 const isSearching = ref(false)
@@ -42,20 +43,38 @@ onMounted(async () => {
 const fetchJobs = async (query?: string, campus?: string) => {
   isSearching.value = true
   try {
-    const [jobsData, applicationRows] = await Promise.all([
+    const [jobsData, displayRows, allRows] = await Promise.all([
       getJobs(query, campus),
       getApplicationsByStatus(['pass', 'partial']),
+      getApplicationsByStatus(['pass', 'partial', 'fail']),
     ])
 
     jobs.value = jobsData
-    applicantsByJob.value = mapApplicationsByJob(applicationRows)
+    applicantsByJob.value = mapApplicationsByJob(displayRows)
+    allApplicationsByJob.value = mapApplicationsByJob(allRows)
 
-    // Collapse all jobs by default
     collapsed.value = new Set(jobsData.map((job) => job.job_id))
   } finally {
     isSearching.value = false
   }
 }
+
+// Pre-compute summary counts for each job to avoid redundant calculations in the template
+const jobSummary = computed(() => {
+  const summary: Record<string, { pass: number; partial: number; failed: number; total: number }> =
+    {}
+
+  for (const [jobId, applicants] of Object.entries(allApplicationsByJob.value)) {
+    summary[jobId] = {
+      pass: applicants.filter((a) => a.status === 'pass').length,
+      partial: applicants.filter((a) => a.status === 'partial').length,
+      failed: applicants.filter((a) => a.status === 'fail').length,
+      total: applicants.length,
+    }
+  }
+
+  return summary
+})
 
 // Debounced search
 let searchTimeout: ReturnType<typeof setTimeout>
@@ -324,6 +343,31 @@ const formatDate = (d: string) =>
                 >
                 <span class="text-gray-700">{{ job.other_qualifications }}</span>
               </div>
+            </div>
+
+            <!-- Applicant Summary Strip -->
+            <div
+              class="flex items-center gap-4 px-6 py-3 bg-white border-b border-stone-100 text-xs"
+            >
+              <span class="text-gray-400 font-medium uppercase tracking-widest text-[10px]"
+                >Summary</span
+              >
+              <span class="flex items-center gap-1.5 font-semibold text-gray-600">
+                <PhUsers :size="12" weight="bold" />
+                {{ jobSummary[job.job_id]?.total ?? 0 }} Total
+              </span>
+              <span class="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                {{ jobSummary[job.job_id]?.pass ?? 0 }} Passed
+              </span>
+              <span class="flex items-center gap-1.5 text-amber-600 font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+                {{ jobSummary[job.job_id]?.partial ?? 0 }} Partial
+              </span>
+              <span class="flex items-center gap-1.5 text-red-500 font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block" />
+                {{ jobSummary[job.job_id]?.failed ?? 0 }} Failed
+              </span>
             </div>
 
             <!-- Applicant Table -->
