@@ -2,7 +2,7 @@ import type { Job } from '@/types/jobs'
 import type { ApplicationFormData } from '@/types/applyform'
 
 export interface MatchResult {
-  status: 'pass' | 'fail' | 'partial'
+  status: 'pass' | 'fail' | 'partial' | 'unknown'
   reason?: string
 }
 
@@ -50,7 +50,10 @@ export async function assessJobMatch(
 ): Promise<MatchResult> {
   if (!apiKey) {
     console.error('Gemini API key is missing')
-    return { status: 'fail', reason: 'API key is not configured' }
+    return {
+      status: 'unknown',
+      reason: 'Assessment service is not configured.',
+    }
   }
 
   // convert File to Base64
@@ -107,10 +110,9 @@ export async function assessJobMatch(
       if (response.status === 429) {
         const isLastAttempt = attempt === MAX_RETRIES - 1
         if (isLastAttempt) {
-          console.error('Gemini rate limit exceeded after retries')
           return {
-            status: 'fail',
-            reason: 'Service is temporarily busy. Please try again in a moment.',
+            status: 'unknown',
+            reason: 'Assessment temporarily unavailable due to high demand. Please retry.',
           }
         }
 
@@ -122,13 +124,17 @@ export async function assessJobMatch(
 
       // Gemini-level error in response body (e.g. invalid key, model not found)
       if (data.error) {
-        console.error('Gemini API error:', data.error.message)
-        return { status: 'fail', reason: `Gemini error: ${data.error.message}` }
+        return {
+          status: 'unknown',
+          reason: 'Assessment failed due to API error. Please retry.',
+        }
       }
 
       if (!response.ok) {
-        console.error('Gemini HTTP error:', response.status, response.statusText)
-        return { status: 'fail', reason: 'Failed to contact Gemini API' }
+        return {
+          status: 'unknown',
+          reason: 'Assessment service unavailable. Please retry.',
+        }
       }
 
       const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
@@ -138,8 +144,10 @@ export async function assessJobMatch(
     } catch (error) {
       const isLastAttempt = attempt === MAX_RETRIES - 1
       if (isLastAttempt) {
-        console.error('Error assessing job match:', error)
-        return { status: 'fail', reason: 'An unexpected error occurred while processing' }
+        return {
+          status: 'unknown',
+          reason: 'Network error. Please retry.',
+        }
       }
 
       const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt)
@@ -148,7 +156,10 @@ export async function assessJobMatch(
     }
   }
 
-  return { status: 'fail', reason: 'Unknown error' }
+  return {
+    status: 'unknown',
+    reason: 'Assessment could not be completed.',
+  }
 }
 
 function sleep(ms: number): Promise<void> {
@@ -234,5 +245,8 @@ function parseGeminiResponse(responseText: string): MatchResult {
 
   // Fallback for unexpected formats
   console.warn('Unexpected Gemini response format:', responseText)
-  return { status: 'fail', reason: 'Unable to parse assessment result' }
+  return {
+    status: 'unknown',
+    reason: 'Invalid response from assessment service',
+  }
 }
